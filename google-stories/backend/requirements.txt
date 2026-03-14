@@ -1,0 +1,10 @@
+﻿fastapi
+uvicorn
+google-cloud-aiplatform
+google-cloud-storage
+google-cloud-texttospeech
+google-cloud-firestore
+python-dotenv
+sse-starlette
+pillow
+requests
