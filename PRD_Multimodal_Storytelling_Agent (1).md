@@ -1,6 +1,6 @@
 # Multimodal Storytelling Agent — Product Requirements Document
 
-**Version:** 1.0  
+**Version:** 1.1 (2-Day Sprint)  
 **Date:** March 2026  
 **Status:** Draft  
 **Tags:** Gemini 2.0 Flash · Interleaved Output · Google Cloud · Multimodal
@@ -98,7 +98,7 @@ User provides a brand voice guideline and topic. The agent generates platform-op
 
 ## 8. Success Metrics
 
-| Metric | Baseline | Target (6 months) |
+| Metric | Baseline | Target (end of Day 2) |
 |---|---|---|
 | Time to produce multimodal campaign | 2–4 days | < 30 minutes |
 | User satisfaction (CSAT) | — | ≥ 4.2 / 5 |
@@ -117,4 +117,4 @@ User provides a brand voice guideline and topic. The agent generates platform-op
 
 ---
 
-*Document owner: Product Management · Next review: 4 weeks post Phase 1 kickoff*
+*Document owner: Product Management · Next review: end of Day 1*

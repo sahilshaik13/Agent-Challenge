@@ -1,29 +1,29 @@
 # Multimodal Storytelling Agent — Implementation Plan
 
-**Version:** 1.0  
+**Version:** 1.1 (2-Day Sprint)  
 **Date:** March 2026  
-**Duration:** 20 weeks · 3 phases  
+**Duration:** 2 days · 3 phases  
 **Team size:** 8 (2 AI/ML, 2 Backend, 1 Frontend, 1 DevOps/SRE, 1 Designer, 1 PM)
 
 ---
 
 ## Summary
 
-| Phase | Weeks | Focus | Milestone |
+| Phase | Time Block | Focus | Milestone |
 |---|---|---|---|
-| Phase 1 — Foundation | 1–6 | Gemini PoC, core infrastructure, storybook template | Internal demo |
-| Phase 2 — Use Cases & Hardening | 7–14 | All 4 templates, audio, load testing, closed beta | Beta launch (50 users) |
-| Phase 3 — GA Polish & Scale | 15–20 | Asset library, exports, billing, public launch | GA v1.0 |
+| Phase 1 — Foundation | Day 1, 9:00am–1:30pm | Gemini PoC, core infrastructure, storybook template | Internal demo |
+| Phase 2 — Use Cases & Hardening | Day 1, 1:30pm–6:00pm + Day 2, 9:00am–12:30pm | All 4 templates, audio, load testing, closed beta | Beta launch (50 users) |
+| Phase 3 — GA Polish & Scale | Day 2, 12:30pm–6:00pm | Asset library, exports, billing, public launch | GA v1.0 |
 
 ---
 
-## Phase 1 — Foundation (Weeks 1–6)
+## Phase 1 — Foundation (Day 1, 9:00am–1:30pm)
 
 **Goal:** Establish the core Gemini integration, baseline infrastructure, and a working end-to-end interleaved generation proof-of-concept.
 
 ---
 
-### Week 1–2 · GCP Project Setup & Gemini Access
+### Day 1, 9:00–10:00am · GCP Project Setup & Gemini Access
 
 **Owner:** DevOps/SRE + Backend Engineer  
 **Deliverables:**
@@ -38,7 +38,7 @@
 
 ---
 
-### Week 2–3 · Gemini Interleaved Output PoC
+### Day 1, 10:00–11:00am · Gemini Interleaved Output PoC
 
 **Owner:** AI/ML Engineers  
 **Deliverables:**
@@ -52,7 +52,7 @@
 
 ---
 
-### Week 3–4 · Creative Director Agent — Core
+### Day 1, 11:00am–12:30pm · Creative Director Agent — Core
 
 **Owner:** AI/ML Engineers + Backend Engineer  
 **Deliverables:**
@@ -66,7 +66,7 @@
 
 ---
 
-### Week 5–6 · Stream Multiplexer + Basic UI
+### Day 1, 12:30–1:30pm · Stream Multiplexer + Basic UI
 
 **Owner:** Backend Engineer + Frontend Engineer  
 **Deliverables:**
@@ -89,13 +89,13 @@
 
 ---
 
-## Phase 2 — Use Cases & Production Hardening (Weeks 7–14)
+## Phase 2 — Use Cases & Production Hardening (Day 1, 1:30pm–6:00pm + Day 2, 9:00am–12:30pm)
 
 **Goal:** Build all four use case templates, add audio and video storyboard generation, harden for production load, and launch closed beta with 50 users.
 
 ---
 
-### Week 7–8 · Marketing + Social Templates
+### Day 1, 1:30–2:30pm · Marketing + Social Templates
 
 **Owner:** AI/ML Engineers + Backend Engineer  
 **Deliverables:**
@@ -107,7 +107,7 @@
 
 ---
 
-### Week 8–9 · Educational Explainer Template
+### Day 1, 2:30–3:30pm · Educational Explainer Template
 
 **Owner:** AI/ML Engineers  
 **Deliverables:**
@@ -118,7 +118,7 @@
 
 ---
 
-### Week 10–11 · Video Storyboard Generation
+### Day 1, 3:30–4:30pm · Video Storyboard Generation
 
 **Owner:** AI/ML Engineers + Backend Engineer  
 **Deliverables:**
@@ -130,7 +130,7 @@
 
 ---
 
-### Week 11–12 · Human-in-the-Loop Editing
+### Day 1, 4:30–5:30pm · Human-in-the-Loop Editing
 
 **Owner:** Backend Engineer + Frontend Engineer  
 **Deliverables:**
@@ -142,7 +142,7 @@
 
 ---
 
-### Week 12–13 · Load Testing + Reliability
+### Day 1, 5:30pm–6:00pm + Day 2, 9:00–10:30am · Load Testing + Reliability
 
 **Owner:** DevOps/SRE + Backend Engineers  
 **Deliverables:**
@@ -157,14 +157,14 @@
 
 ---
 
-### Week 13–14 · Closed Beta Launch
+### Day 2, 10:30am–12:30pm · Closed Beta Launch
 
 **Owner:** PM + Full team  
 **Deliverables:**
 - 50 beta users onboarded across all 4 target personas (12 marketers, 12 educators, 13 publishers, 13 social teams)
 - In-product CSAT survey (5-star + open text) shown at session end
 - Admin dashboard live: generation latency percentiles, token cost per session, safety filter hit rate, WAU
-- Top-10 beta feedback issues triaged and fixed before end of week 14
+- Top-10 beta feedback issues triaged and fixed before end of Day 2, 12:30pm
 - Beta user Slack/Discord channel for direct feedback
 
 ---
@@ -180,13 +180,13 @@
 
 ---
 
-## Phase 3 — GA Polish & Scale (Weeks 15–20)
+## Phase 3 — GA Polish & Scale (Day 2, 12:30pm–6:00pm)
 
 **Goal:** Asset library, export capabilities, billing integration, platform hardening, and public launch.
 
 ---
 
-### Week 15–16 · Asset Library & Style Consistency
+### Day 2, 12:30–2:00pm · Asset Library & Style Consistency
 
 **Owner:** AI/ML Engineers + Backend Engineer  
 **Deliverables:**
@@ -197,7 +197,7 @@
 
 ---
 
-### Week 16–17 · Export & Integrations
+### Day 2, 2:00–3:30pm · Export & Integrations
 
 **Owner:** Backend Engineer + Frontend Engineer  
 **Deliverables:**
@@ -210,7 +210,7 @@
 
 ---
 
-### Week 17–18 · Billing, Plans & API Access
+### Day 2, 3:30–4:30pm · Billing, Plans & API Access
 
 **Owner:** Backend Engineer + PM  
 **Deliverables:**
@@ -222,7 +222,7 @@
 
 ---
 
-### Week 18–20 · GA Launch Prep & Go-Live
+### Day 2, 4:30–6:00pm · GA Launch Prep & Go-Live
 
 **Owner:** Full team  
 **Deliverables:**
@@ -274,15 +274,15 @@
 
 ## Milestones Summary
 
-| Date (relative) | Milestone |
+| Time | Milestone |
 |---|---|
-| End of Week 6 | Phase 1 complete — internal storybook demo live |
-| End of Week 10 | All 4 use case templates live on staging |
-| End of Week 13 | Load test passed — production-ready |
-| End of Week 14 | Closed beta launched (50 users) |
-| End of Week 17 | Export and integrations live |
-| End of Week 18 | Billing and API access live |
-| End of Week 20 | GA v1.0 public launch |
+| Day 1, 1:30pm | Phase 1 complete — internal storybook demo live |
+| Day 1, 4:30pm | All 4 use case templates live on staging |
+| Day 2, 10:30am | Load test passed — production-ready |
+| Day 2, 12:30pm | Closed beta launched (50 users) |
+| Day 2, 3:30pm | Export and integrations live |
+| Day 2, 4:30pm | Billing and API access live |
+| Day 2, 6:00pm | GA v1.0 public launch |
 
 ---
 

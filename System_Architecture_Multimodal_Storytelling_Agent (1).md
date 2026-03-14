@@ -1,6 +1,6 @@
 # Multimodal Storytelling Agent — System Architecture
 
-**Version:** 1.0  
+**Version:** 1.1 (2-Day Sprint)  
 **Date:** March 2026  
 **Runtime:** Google Cloud Platform · Vertex AI (Gemini 2.0 Flash)
 
@@ -212,4 +212,4 @@ Gemini generates text and images in a single inference pass, interleaved in the 
 
 ---
 
-*Document owner: Engineering · Next review: end of Phase 1*
+*Document owner: Engineering · Next review: end of Day 1*
