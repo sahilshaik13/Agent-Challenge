@@ -3,3 +3,5 @@ Google_Stories_Master_Brief.md
 credentials.json
 .env
 venv/
+node_modules/
+__pycache__/
