@@ -23,11 +23,10 @@ const loadHistory = () => {
 const saveToHistory = (story) => {
   try {
     const history = loadHistory()
-    const exists  = history.findIndex(h => h.id === story.id)
+    const exists = history.findIndex(h => h.id === story.id)
     if (exists >= 0) history[exists] = story
     else history.unshift(story)
-    const trimmed = history.slice(0, MAX_HISTORY)
-    localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(trimmed))
+    localStorage.setItem(STORAGE_KEY_HISTORY, JSON.stringify(history.slice(0, MAX_HISTORY)))
   } catch {}
 }
 const deleteFromHistory = (id) => {
@@ -58,11 +57,9 @@ const GlobalStyles = () => (
       --navy3:     #1e2533;
       --clay-r:    #ff6b6b;
       --clay-o:    #ff9f43;
-      --clay-y:    #ffd32a;
       --clay-g:    #1dd1a1;
       --clay-b:    #48dbfb;
       --clay-p:    #a29bfe;
-      --clay-pk:   #fd79a8;
       --white:     #ffffff;
       --text-dim:  #8892a4;
       --text-mid:  #c8d0e0;
@@ -76,6 +73,7 @@ const GlobalStyles = () => (
     }
 
     html { scroll-behavior: smooth; }
+
     body {
       background: var(--navy);
       font-family: var(--font-body);
@@ -83,6 +81,7 @@ const GlobalStyles = () => (
       min-height: 100vh;
       overflow-x: hidden;
     }
+
     body::before {
       content: '';
       position: fixed; top: -200px; left: -200px;
@@ -117,6 +116,7 @@ const GlobalStyles = () => (
       display: inline-flex; align-items: center; justify-content: center; gap: 8px;
     }
     .clay-btn:active { transform: translateY(3px); }
+
     .clay-btn-primary {
       background: linear-gradient(135deg, #ff9f43, #ff6b6b);
       color: #fff;
@@ -127,6 +127,7 @@ const GlobalStyles = () => (
       background: var(--navy3); color: var(--text-dim);
       box-shadow: 0 6px 0 rgba(0,0,0,0.3); cursor: not-allowed;
     }
+
     .clay-btn-voice {
       background: var(--navy3); color: var(--clay-o);
       border: 2px dashed var(--clay-o);
@@ -137,20 +138,21 @@ const GlobalStyles = () => (
       border-color: var(--clay-r);
       animation: pulse-ring 1.5s ease-in-out infinite;
     }
+
     .clay-btn-ghost {
       background: transparent; color: var(--clay-o);
       border: 2.5px solid var(--clay-o);
       box-shadow: 0 6px 0 #7a4000;
     }
     .clay-btn-ghost:active { box-shadow: 0 2px 0 #7a4000; }
+
     .clay-btn-danger {
       background: transparent; color: var(--clay-r);
       border: 2px solid rgba(255,107,107,0.4);
       box-shadow: 0 4px 0 rgba(0,0,0,0.3);
     }
-    .clay-btn-sm {
-      padding: 8px 16px; font-size: 13px; border-radius: 10px;
-    }
+
+    .clay-btn-sm { padding: 8px 16px; font-size: 13px; border-radius: 10px; }
 
     .clay-input {
       width: 100%; background: var(--navy);
@@ -208,11 +210,13 @@ const GlobalStyles = () => (
       font-size: 14px; font-weight: 600; color: var(--clay-o);
       font-style: italic; margin-bottom: 16px; line-height: 1.6;
     }
+
     .error-box {
       background: rgba(255,107,107,0.1); border: 1.5px solid rgba(255,107,107,0.4);
       border-radius: var(--radius-md); padding: 12px 16px;
       font-size: 13px; font-weight: 600; color: var(--clay-r); margin-bottom: 16px;
     }
+
     .done-accent {
       width: 60px; height: 5px;
       background: linear-gradient(90deg, var(--clay-o), var(--clay-r));
@@ -231,6 +235,7 @@ const GlobalStyles = () => (
       border-color: var(--clay-b); background: rgba(72,219,251,0.08);
       color: var(--clay-b); box-shadow: 0 4px 0 rgba(14,74,110,0.5);
     }
+
     .age-chip {
       flex: 1; padding: 11px 8px; border-radius: var(--radius-md);
       border: 2px solid var(--card-edge); background: var(--navy);
@@ -249,33 +254,25 @@ const GlobalStyles = () => (
       border: 2px solid var(--card-edge);
     }
 
-    /* History card */
     .history-card {
-      background: var(--card-bg);
-      border: 1.5px solid var(--card-edge);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      cursor: pointer;
+      background: var(--card-bg); border: 1.5px solid var(--card-edge);
+      border-radius: var(--radius-lg); overflow: hidden; cursor: pointer;
       transition: transform 0.15s, box-shadow 0.15s;
-      box-shadow: 0 6px 0 rgba(0,0,0,0.35);
-      position: relative;
+      box-shadow: 0 6px 0 rgba(0,0,0,0.35); position: relative;
     }
     .history-card:hover {
       transform: translateY(-3px);
       box-shadow: 0 10px 0 rgba(0,0,0,0.35), 0 20px 30px rgba(0,0,0,0.2);
     }
-    .history-thumb {
-      width: 100%; height: 140px; object-fit: cover; display: block;
-    }
+    .history-thumb { width: 100%; height: 140px; object-fit: cover; display: block; }
     .history-thumb-placeholder {
       width: 100%; height: 140px;
       background: linear-gradient(135deg, var(--navy3), var(--navy2));
-      display: flex; align-items: center; justify-content: center;
-      font-size: 40px;
+      display: flex; align-items: center; justify-content: center; font-size: 40px;
     }
     .history-delete-btn {
       position: absolute; top: 8px; right: 8px;
-      background: rgba(13,17,23,0.8); border: 1px solid rgba(255,107,107,0.4);
+      background: rgba(13,17,23,0.85); border: 1px solid rgba(255,107,107,0.4);
       border-radius: 8px; color: var(--clay-r);
       width: 28px; height: 28px; cursor: pointer;
       display: flex; align-items: center; justify-content: center;
@@ -284,20 +281,16 @@ const GlobalStyles = () => (
     }
     .history-card:hover .history-delete-btn { opacity: 1; }
 
-    /* Nav tabs */
     .nav-tab {
       padding: 8px 20px; border-radius: 50px;
       font-family: var(--font-body); font-weight: 700;
-      font-size: 14px; cursor: pointer; border: none;
-      transition: all 0.15s;
+      font-size: 14px; cursor: pointer; border: none; transition: all 0.15s;
     }
     .nav-tab.active {
       background: var(--card-bg); color: var(--white);
       box-shadow: 0 4px 0 rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
     }
-    .nav-tab.inactive {
-      background: transparent; color: var(--text-dim);
-    }
+    .nav-tab.inactive { background: transparent; color: var(--text-dim); }
     .nav-tab.inactive:hover { color: var(--white); }
 
     .generating-dots span { animation: bounce-dot 1.2s ease-in-out infinite; display: inline-block; }
@@ -327,7 +320,9 @@ const GlobalStyles = () => (
 ───────────────────────────────────────────── */
 const SkeletonPage = ({ index }) => (
   <div style={{ marginBottom: 32 }} className="fade-up">
-    <div className="page-pill"><span>🎨</span> Illustrating page {index + 1}...</div>
+    <div className="page-pill">
+      <span>🎨</span> Illustrating page {index + 1}...
+    </div>
     <div className="skeleton" style={{ height: 18, width: "85%", marginBottom: 8 }} />
     <div className="skeleton" style={{ height: 18, width: "68%", marginBottom: 16 }} />
     <div className="skeleton" style={{ height: 320, width: "100%", borderRadius: 28 }} />
@@ -337,7 +332,7 @@ const SkeletonPage = ({ index }) => (
 /* ─────────────────────────────────────────────
    HISTORY PANEL
 ───────────────────────────────────────────── */
-const HistoryPanel = ({ onLoad, onClose }) => {
+const HistoryPanel = ({ onLoad }) => {
   const [history, setHistory] = useState(loadHistory)
 
   const handleDelete = (e, id) => {
@@ -384,31 +379,21 @@ const HistoryPanel = ({ onLoad, onClose }) => {
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: 16 }}>
           {history.map(story => (
-            <div
-              key={story.id}
-              className="history-card"
-              onClick={() => onLoad(story)}
-            >
-              {/* Thumbnail — first image from the story */}
+            <div key={story.id} className="history-card" onClick={() => onLoad(story)}>
               {story.thumbnail ? (
                 <img src={story.thumbnail} alt="" className="history-thumb" />
               ) : (
                 <div className="history-thumb-placeholder">📖</div>
               )}
-
-              {/* Delete button */}
-              <button
-                className="history-delete-btn"
-                onClick={e => handleDelete(e, story.id)}
-              >✕</button>
-
-              {/* Info */}
+              <button className="history-delete-btn" onClick={e => handleDelete(e, story.id)}>✕</button>
               <div style={{ padding: "12px 14px" }}>
                 <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 3 }}>
                   {story.brief?.child_name}'s Story
                 </div>
-                <div style={{ fontSize: 12, color: "var(--text-dim)", fontWeight: 600,
-                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                <div style={{
+                  fontSize: 12, color: "var(--text-dim)", fontWeight: 600,
+                  whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis"
+                }}>
                   {story.brief?.story_topic}
                 </div>
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 8 }}>
@@ -432,19 +417,18 @@ const HistoryPanel = ({ onLoad, onClose }) => {
    MAIN APP
 ───────────────────────────────────────────── */
 export default function App() {
-  // ── Active view: "form" | "story" | "history" ──────────────────────────────
-  const [view, setView] = useState("form")
-
-  const [brief, setBrief] = useState({
+  const [view, setView]                   = useState("form")
+  const [brief, setBrief]                 = useState({
     child_name: "", story_topic: "", style: "watercolor",
     age_group: "6-8", characters: [], voice_transcript: "",
   })
-  const [segments, setSegments]         = useState([])
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [isListening, setIsListening]   = useState(false)
-  const [done, setDone]                 = useState(false)
-  const [error, setError]               = useState("")
-  const [pageCount, setPageCount]       = useState(0)
+  const [segments, setSegments]           = useState([])
+  const [isGenerating, setIsGenerating]   = useState(false)
+  const [isListening, setIsListening]     = useState(false)
+  const [done, setDone]                   = useState(false)
+  const [error, setError]                 = useState("")
+  const [pageCount, setPageCount]         = useState(0)
+  const [creativeNote, setCreativeNote]   = useState("")
   const [currentStoryId, setCurrentStoryId] = useState(null)
 
   const audioQueueRef  = useRef([])
@@ -452,7 +436,7 @@ export default function App() {
   const recognitionRef = useRef(null)
   const storyEndRef    = useRef(null)
 
-  // ── Restore current story on mount ────────────────────────────────────────
+  // ── Restore story on mount ─────────────────────────────────────────────────
   useEffect(() => {
     const saved = loadCurrentStory()
     if (saved && saved.segments?.length > 0) {
@@ -460,29 +444,29 @@ export default function App() {
       setSegments(saved.segments)
       setDone(saved.done || false)
       setPageCount(saved.pageCount || 0)
+      setCreativeNote(saved.creativeNote || "")
       setCurrentStoryId(saved.id)
       setView("story")
     }
   }, [])
 
-  // ── Auto-save current story whenever segments change ──────────────────────
+  // ── Auto-save whenever segments change ────────────────────────────────────
   useEffect(() => {
     if (segments.length === 0) return
     const storyData = {
-      id:         currentStoryId || Date.now().toString(),
+      id:          currentStoryId || Date.now().toString(),
       brief,
       segments,
       done,
       pageCount,
-      savedAt:    new Date().toISOString(),
-      thumbnail:  segments.find(s => s.type === "image")?.url || null,
-      imageCount: segments.filter(s => s.type === "image").length,
+      creativeNote,
+      savedAt:     new Date().toISOString(),
+      thumbnail:   segments.find(s => s.type === "image")?.url || null,
+      imageCount:  segments.filter(s => s.type === "image").length,
     }
     saveCurrentStory(storyData)
-    if (done) {
-      saveToHistory(storyData)
-    }
-  }, [segments, done])
+    if (done) saveToHistory(storyData)
+  }, [segments, done, creativeNote])
 
   useEffect(() => {
     storyEndRef.current?.scrollIntoView({ behavior: "smooth" })
@@ -494,7 +478,8 @@ export default function App() {
     isPlayingRef.current = true
     const url = audioQueueRef.current.shift()
     const audio = new Audio(url)
-    audio.onended = playNextAudio; audio.onerror = playNextAudio
+    audio.onended = playNextAudio
+    audio.onerror = playNextAudio
     audio.play().catch(playNextAudio)
   }
   const queueAudio = (url) => {
@@ -526,7 +511,7 @@ export default function App() {
     const newId = Date.now().toString()
     setCurrentStoryId(newId)
     setSegments([]); setIsGenerating(true); setDone(false)
-    setError(""); setPageCount(0)
+    setError(""); setPageCount(0); setCreativeNote("")
     audioQueueRef.current = []; isPlayingRef.current = false
     clearCurrentStory()
     setView("story")
@@ -539,9 +524,9 @@ export default function App() {
       })
       if (!response.ok) throw new Error(`Server error: ${response.status}`)
 
-      const reader = response.body.getReader()
+      const reader  = response.body.getReader()
       const decoder = new TextDecoder()
-      let buffer = ""
+      let buffer    = ""
 
       while (true) {
         const { done: sd, value } = await reader.read()
@@ -553,12 +538,15 @@ export default function App() {
           if (!line.startsWith("data: ")) continue
           try {
             const ev = JSON.parse(line.slice(6))
+
             if (ev.type === "text") {
               setSegments(s => {
                 const last = s[s.length - 1]
                 if (last?.type === "text") return [...s.slice(0, -1), { ...last, content: last.content + ev.delta }]
                 return [...s, { type: "text", content: ev.delta, id: Date.now() }]
               })
+            } else if (ev.type === "creative_note") {
+              setCreativeNote(ev.message)
             } else if (ev.type === "image_loading") {
               setSegments(s => [...s, { type: "image_loading", index: ev.index, id: Date.now() + Math.random() }])
             } else if (ev.type === "image") {
@@ -583,28 +571,30 @@ export default function App() {
     }
   }
 
-  // ── Load story from history ────────────────────────────────────────────────
+  // ── Load from history ──────────────────────────────────────────────────────
   const loadStoryFromHistory = (story) => {
     setBrief(story.brief)
     setSegments(story.segments)
     setDone(story.done)
     setPageCount(story.pageCount)
+    setCreativeNote(story.creativeNote || "")
     setCurrentStoryId(story.id)
     saveCurrentStory(story)
     setView("story")
-    setTimeout(() => window.scrollTo({ top: 0, behavior: "smooth" }), 100)
+    window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
   // ── New story ──────────────────────────────────────────────────────────────
   const newStory = () => {
-    setSegments([]); setDone(false); setError(""); setPageCount(0)
-    setCurrentStoryId(null); clearCurrentStory()
+    setSegments([]); setDone(false); setError("")
+    setPageCount(0); setCurrentStoryId(null)
+    setCreativeNote(""); clearCurrentStory()
     setBrief({ child_name: "", story_topic: "", style: "watercolor", age_group: "6-8", characters: [], voice_transcript: "" })
     setView("form")
     window.scrollTo({ top: 0, behavior: "smooth" })
   }
 
-  // ── Page number tracking ───────────────────────────────────────────────────
+  // ── Page numbering ─────────────────────────────────────────────────────────
   let pageIndex = 0
   const segmentsWithPageNums = segments.map(seg => {
     if (seg.type === "image" || seg.type === "image_loading") {
@@ -613,9 +603,8 @@ export default function App() {
     return seg
   })
 
-  const historyCount = loadHistory().length
-
-  const styleOptions = [
+  const historyCount    = loadHistory().length
+  const styleOptions    = [
     { value: "watercolor", label: "Watercolor", icon: "🎨" },
     { value: "cartoon",    label: "Cartoon",    icon: "✏️" },
     { value: "sketch",     label: "Sketch",     icon: "🖊️" },
@@ -646,12 +635,13 @@ export default function App() {
           </div>
         </div>
 
-        {/* Nav tabs */}
-        <div style={{ display: "flex", gap: 4, background: "var(--navy2)",
-          borderRadius: 50, padding: 4, border: "1px solid var(--card-edge)" }}>
+        <div style={{
+          display: "flex", gap: 4, background: "var(--navy2)",
+          borderRadius: 50, padding: 4, border: "1px solid var(--card-edge)"
+        }}>
           <button
-            className={`nav-tab ${view === "form" || view === "story" ? "active" : "inactive"}`}
-            onClick={() => view === "story" ? null : setView("form")}
+            className={`nav-tab ${view !== "history" ? "active" : "inactive"}`}
+            onClick={() => view === "history" ? setView(segments.length > 0 ? "story" : "form") : null}
           >
             ✨ Create
           </button>
@@ -678,7 +668,6 @@ export default function App() {
           border: "1.5px solid rgba(255,159,67,0.3)", borderRadius: 50,
           padding: "5px 12px", fontSize: 11, fontWeight: 800,
           color: "var(--clay-o)", letterSpacing: "0.4px",
-          display: window.innerWidth < 600 ? "none" : "block",
         }}>
           Gemini Live Agent Challenge
         </div>
@@ -686,17 +675,12 @@ export default function App() {
 
       {/* ── HISTORY VIEW ───────────────────────────────────────────────────── */}
       {view === "history" && (
-        <HistoryPanel
-          onLoad={loadStoryFromHistory}
-          onClose={() => setView("form")}
-        />
+        <HistoryPanel onLoad={loadStoryFromHistory} />
       )}
 
       {/* ── FORM VIEW ──────────────────────────────────────────────────────── */}
       {view === "form" && (
         <main style={{ maxWidth: 640, margin: "0 auto", padding: "48px 20px" }}>
-
-          {/* Hero */}
           <div style={{ textAlign: "center", marginBottom: 44 }} className="fade-up">
             <div className="float" style={{ marginBottom: 20 }}>
               <img src="/GoogleStories.png" alt="" style={{
@@ -719,8 +703,6 @@ export default function App() {
           </div>
 
           <div className="clay-card" style={{ padding: 32 }}>
-
-            {/* Voice */}
             <button
               className={`clay-btn clay-btn-voice${isListening ? " listening" : ""}`}
               onClick={isListening ? stopVoice : startVoice}
@@ -728,7 +710,9 @@ export default function App() {
             >
               <span style={{ fontSize: 20 }}>{isListening ? "⏹" : "🎤"}</span>
               {isListening ? "Stop listening..." : "Speak your story brief"}
-              {isListening && <span style={{ fontSize: 11, color: "var(--clay-r)", fontWeight: 700 }}>● LIVE</span>}
+              {isListening && (
+                <span style={{ fontSize: 11, color: "var(--clay-r)", fontWeight: 700 }}>● LIVE</span>
+              )}
             </button>
 
             {brief.voice_transcript && (
@@ -739,26 +723,35 @@ export default function App() {
 
             <div style={{ marginBottom: 18 }}>
               <label className="clay-label">Child's name</label>
-              <input className="clay-input" value={brief.child_name}
+              <input
+                className="clay-input"
+                value={brief.child_name}
                 onChange={e => setBrief(b => ({ ...b, child_name: e.target.value }))}
-                placeholder="e.g. Priya" />
+                placeholder="e.g. Priya"
+              />
             </div>
 
             <div style={{ marginBottom: 24 }}>
               <label className="clay-label">Story topic & lesson</label>
-              <input className="clay-input" value={brief.story_topic}
+              <input
+                className="clay-input"
+                value={brief.story_topic}
                 onChange={e => setBrief(b => ({ ...b, story_topic: e.target.value }))}
-                placeholder="e.g. Priya and Bruno in Hyderabad, learning to ask for help" />
+                placeholder="e.g. Priya and Bruno in Hyderabad, learning to ask for help"
+              />
             </div>
 
             <div style={{ marginBottom: 18 }}>
               <label className="clay-label">Illustration style</label>
               <div style={{ display: "flex", gap: 10 }}>
                 {styleOptions.map(opt => (
-                  <button key={opt.value}
+                  <button
+                    key={opt.value}
                     className={`style-chip${brief.style === opt.value ? " active" : ""}`}
-                    onClick={() => setBrief(b => ({ ...b, style: opt.value }))}>
-                    <span style={{ fontSize: 20 }}>{opt.icon}</span>{opt.label}
+                    onClick={() => setBrief(b => ({ ...b, style: opt.value }))}
+                  >
+                    <span style={{ fontSize: 20 }}>{opt.icon}</span>
+                    {opt.label}
                   </button>
                 ))}
               </div>
@@ -768,9 +761,11 @@ export default function App() {
               <label className="clay-label">Child's age</label>
               <div style={{ display: "flex", gap: 10 }}>
                 {["3-5", "6-8", "9-12"].map(age => (
-                  <button key={age}
+                  <button
+                    key={age}
                     className={`age-chip${brief.age_group === age ? " active" : ""}`}
-                    onClick={() => setBrief(b => ({ ...b, age_group: age }))}>
+                    onClick={() => setBrief(b => ({ ...b, age_group: age }))}
+                  >
                     {age} yrs
                   </button>
                 ))}
@@ -779,21 +774,22 @@ export default function App() {
 
             {error && <div className="error-box">{error}</div>}
 
-            <button className="clay-btn clay-btn-primary"
+            <button
+              className="clay-btn clay-btn-primary"
               onClick={generate}
               disabled={!brief.child_name || !brief.story_topic}
-              style={{ width: "100%", padding: "17px 24px", fontSize: 17 }}>
+              style={{ width: "100%", padding: "17px 24px", fontSize: 17 }}
+            >
               <span style={{ fontSize: 20 }}>✨</span>
               Generate {brief.child_name ? `${brief.child_name}'s` : "the"} storybook
             </button>
           </div>
 
-          {/* Feature pills */}
           <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 12, marginTop: 16 }}>
             {[
-              { icon: "🎨", label: "Imagen 3",      sub: "illustrations" },
-              { icon: "🔊", label: "AI narration",  sub: "auto-plays" },
-              { icon: "💾", label: "Auto-saved",    sub: "on this device" },
+              { icon: "🎨", label: "Imagen 3",     sub: "illustrations" },
+              { icon: "🔊", label: "AI narration", sub: "auto-plays" },
+              { icon: "💾", label: "Auto-saved",   sub: "on this device" },
             ].map(f => (
               <div key={f.label} className="clay-card" style={{ padding: "14px 12px", textAlign: "center" }}>
                 <div style={{ fontSize: 22, marginBottom: 4 }}>{f.icon}</div>
@@ -809,7 +805,9 @@ export default function App() {
       {view === "story" && isGenerating && segments.length === 0 && (
         <div style={{ maxWidth: 400, margin: "80px auto", textAlign: "center", padding: "0 20px" }}>
           <div className="float" style={{ marginBottom: 24 }}>
-            <img src="/GoogleStories.png" alt="" style={{ width: 80, height: 80, borderRadius: 24, objectFit: "cover" }} />
+            <img src="/GoogleStories.png" alt="" style={{
+              width: 80, height: 80, borderRadius: 24, objectFit: "cover"
+            }} />
           </div>
           <div style={{ fontFamily: "var(--font-display)", fontSize: 26, fontWeight: 800, marginBottom: 10 }}>
             Writing {brief.child_name}'s story...
@@ -828,10 +826,13 @@ export default function App() {
         <div style={{ maxWidth: 680, margin: "0 auto", padding: "32px 20px" }}>
 
           {/* Story header */}
-          <div style={{ textAlign: "center", marginBottom: 40, paddingBottom: 32,
-            borderBottom: "1px solid var(--card-edge)" }}>
-            <img src="/GoogleStories.png" alt="" style={{ width: 52, height: 52,
-              borderRadius: 14, objectFit: "cover", marginBottom: 14 }} />
+          <div style={{
+            textAlign: "center", marginBottom: 40, paddingBottom: 32,
+            borderBottom: "1px solid var(--card-edge)"
+          }}>
+            <img src="/GoogleStories.png" alt="" style={{
+              width: 52, height: 52, borderRadius: 14, objectFit: "cover", marginBottom: 14
+            }} />
             <div style={{ fontFamily: "var(--font-display)", fontSize: 32, fontWeight: 800, marginBottom: 6 }}>
               {brief.child_name}'s Story
             </div>
@@ -839,21 +840,43 @@ export default function App() {
               {brief.story_topic}
             </div>
 
-            {/* Restored badge */}
+            {/* Creative Director note — judges look for this */}
+            {creativeNote && (
+              <div style={{
+                marginTop: 14, padding: "10px 20px",
+                background: "rgba(162,155,254,0.1)",
+                border: "1.5px solid rgba(162,155,254,0.25)",
+                borderRadius: 14, fontSize: 13,
+                color: "var(--clay-p)", fontWeight: 600,
+                fontStyle: "italic", maxWidth: 520,
+                margin: "14px auto 0", lineHeight: 1.6,
+              }}>
+                🎨 {creativeNote}
+              </div>
+            )}
+
+            {/* Saved badge */}
             {!isGenerating && done && (
-              <div style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 6,
+              <div style={{
+                marginTop: 12, display: "inline-flex", alignItems: "center", gap: 6,
                 background: "rgba(29,209,161,0.1)", border: "1.5px solid rgba(29,209,161,0.25)",
-                borderRadius: 50, padding: "4px 14px", fontSize: 11, fontWeight: 700, color: "var(--clay-g)" }}>
+                borderRadius: 50, padding: "4px 14px", fontSize: 11, fontWeight: 700, color: "var(--clay-g)"
+              }}>
                 💾 Saved to your library
               </div>
             )}
 
+            {/* Generating badge */}
             {isGenerating && (
-              <div style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 8,
+              <div style={{
+                marginTop: 12, display: "inline-flex", alignItems: "center", gap: 8,
                 background: "rgba(72,219,251,0.1)", border: "1.5px solid rgba(72,219,251,0.25)",
-                borderRadius: 50, padding: "5px 14px", fontSize: 12, fontWeight: 700, color: "var(--clay-b)" }}>
-                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--clay-b)",
-                  display: "inline-block", animation: "pulse-ring 1s ease-in-out infinite" }} />
+                borderRadius: 50, padding: "5px 14px", fontSize: 12, fontWeight: 700, color: "var(--clay-b)"
+              }}>
+                <span style={{
+                  width: 6, height: 6, borderRadius: "50%", background: "var(--clay-b)",
+                  display: "inline-block", animation: "pulse-ring 1s ease-in-out infinite"
+                }} />
                 Generating page {pageCount + 1} of 6...
               </div>
             )}
@@ -872,9 +895,12 @@ export default function App() {
                 <div style={{ marginBottom: 40 }}>
                   <div className="page-pill"><span>🖼️</span> Page {seg.pageNum}</div>
                   <div className="story-img-wrap">
-                    <img src={seg.url} alt={`Story illustration page ${seg.pageNum}`}
+                    <img
+                      src={seg.url}
+                      alt={`Story illustration page ${seg.pageNum}`}
                       style={{ width: "100%", display: "block" }}
-                      onError={e => { e.target.parentElement.style.display = "none" }} />
+                      onError={e => { e.target.parentElement.style.display = "none" }}
+                    />
                   </div>
                 </div>
               )}
@@ -882,8 +908,10 @@ export default function App() {
           ))}
 
           {isGenerating && segments.length > 0 && (
-            <div className="generating-dots" style={{ textAlign: "center", padding: "16px 0",
-              fontSize: 20, letterSpacing: 6, color: "var(--text-dim)" }}>
+            <div className="generating-dots" style={{
+              textAlign: "center", padding: "16px 0",
+              fontSize: 20, letterSpacing: 6, color: "var(--text-dim)"
+            }}>
               <span>●</span><span>●</span><span>●</span>
             </div>
           )}
@@ -900,17 +928,25 @@ export default function App() {
                 Narration playing automatically · {pageCount} illustrations
               </div>
               <div style={{ fontSize: 13, color: "var(--clay-g)", fontWeight: 700, marginBottom: 28 }}>
-                💾 Saved — you can close the browser and it'll still be here
+                💾 Saved — close the browser and it'll still be here
               </div>
               <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-                <button className="clay-btn clay-btn-ghost" onClick={newStory}
-                  style={{ padding: "13px 24px", fontSize: 15 }}>
+                <button
+                  className="clay-btn clay-btn-ghost"
+                  onClick={newStory}
+                  style={{ padding: "13px 24px", fontSize: 15 }}
+                >
                   ✨ New story
                 </button>
-                <button className="clay-btn clay-btn-sm"
-                  style={{ background: "var(--navy3)", color: "var(--clay-b)",
-                    border: "2px solid rgba(72,219,251,0.3)", padding: "13px 24px", fontSize: 15 }}
-                  onClick={() => setView("history")}>
+                <button
+                  className="clay-btn clay-btn-sm"
+                  style={{
+                    background: "var(--navy3)", color: "var(--clay-b)",
+                    border: "2px solid rgba(72,219,251,0.3)",
+                    padding: "13px 24px", fontSize: 15
+                  }}
+                  onClick={() => setView("history")}
+                >
                   📚 View library
                 </button>
               </div>

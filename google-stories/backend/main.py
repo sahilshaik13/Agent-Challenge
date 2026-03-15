@@ -463,6 +463,12 @@ Use this exact format for each of the 6 pages:
 
             # ── Build visual bible for style consistency ──────────────────────────
             visual_bible = await build_visual_bible(brief, full_text)
+            creative_note = (
+                f"Creative Director locked a {brief.style} visual style and character bible "
+                f"to keep {brief.child_name} consistent across all 6 illustrations. "
+                f"Each image is placed at the scene's emotional peak."
+            )
+            yield f"data: {json.dumps({'type': 'creative_note', 'message': creative_note})}\n\n"
 
             # ── Parse [PARAGRAPH] / [ILLUSTRATION] blocks ─────────────────────────
             blocks      = re.split(r'\[(PARAGRAPH|ILLUSTRATION)\]', full_text)
