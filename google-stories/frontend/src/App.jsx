@@ -5,6 +5,7 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080'
 const STORAGE_KEY_CURRENT = 'gs_current_story'
 const STORAGE_KEY_HISTORY = 'gs_story_history'
 const MAX_HISTORY = 20
+const [currentAudioPage, setCurrentAudioPage] = useState(0)
 
 /* ─── STORAGE HELPERS ─── */
 const saveCurrentStory = (d) => { try { localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(d)) } catch { } }
@@ -292,11 +293,18 @@ export default function App() {
   const playNext = () => {
     if (!audioQ.current.length) { playing.current = false; return }
     playing.current = true
-    const a = new Audio(audioQ.current.shift())
-    a.onended = playNext; a.onerror = playNext
+    const { url, pageIdx } = audioQ.current.shift()
+    setCurrentAudioPage(pageIdx)
+    const a = new Audio(url)
+    a.onended = playNext
+    a.onerror = playNext
     a.play().catch(playNext)
   }
-  const queueAudio = (url) => { audioQ.current.push(url); if (!playing.current) playNext() }
+
+  const queueAudio = (url, pageIdx = 0) => {
+    audioQ.current.push({ url, pageIdx })
+    if (!playing.current) playNext()
+  }
 
   /* voice */
   const startVoice = () => {
@@ -346,7 +354,7 @@ export default function App() {
             } else if (ev.type === 'image') {
               setSegments(s => s.map(seg => seg.type === 'image_loading' && seg.index === ev.index ? { type: 'image', url: ev.url, index: ev.index, id: seg.id } : seg)); setPageCount(p => p + 1)
             } else if (ev.type === 'audio') {
-              queueAudio(ev.url)
+              queueAudio(ev.url, pageCount)
             } else if (ev.type === 'done') {
               setDone(true); setIsGenerating(false)
             } else if (ev.type === 'error') { setError(ev.message); setIsGenerating(false) }
@@ -596,6 +604,7 @@ export default function App() {
             onNewStory={newStory}
             onViewHistory={() => setView('history')}
             storyKey={storyId}
+            currentAudioPage={currentAudioPage}
           />
         </div>
       )}
