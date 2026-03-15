@@ -418,8 +418,16 @@ export default function App() {
         </div>
 
         <div style={{ display: 'flex', gap: 3, background: 'var(--bg2)', borderRadius: 50, padding: 4, border: '1.5px solid var(--border)' }}>
-          <button className={`tab ${view !== 'history' ? 'tab-on' : 'tab-off'}`}
-            onClick={() => view === 'history' ? setView(segments.length > 0 ? 'story' : 'form') : null}>
+          <button
+            className={`tab ${view !== 'history' ? 'tab-on' : 'tab-off'}`}
+            onClick={() => {
+              if (view === 'history') {
+                setView(segments.length > 0 ? 'story' : 'form')
+              } else if (view === 'story') {
+                newStory()
+              }
+            }}
+          >
             ✨ Create
           </button>
           <button className={`tab ${view === 'history' ? 'tab-on' : 'tab-off'}`}
@@ -587,6 +595,7 @@ export default function App() {
             isGenerating={isGenerating}
             onNewStory={newStory}
             onViewHistory={() => setView('history')}
+            storyKey={storyId}
           />
         </div>
       )}
