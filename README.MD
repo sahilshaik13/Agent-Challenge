@@ -37,7 +37,7 @@ And within 2 minutes receives a **6-page illustrated storybook** — watercolor 
 
 ## Demo Video
 
-[![Google Stories Demo](https://img.shields.io/badge/Watch%20Demo-YouTube-red?style=for-the-badge)](https://your-demo-link-here)
+[![Google Stories Demo](https://img.shields.io/badge/Watch%20Demo-YouTube-red?style=for-the-badge)](https://youtu.be/vevC7iWvHgo)
 
 ---
 
