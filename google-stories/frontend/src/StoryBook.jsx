@@ -31,6 +31,16 @@ const STAR = [
     [P, P, P, '#FCD34D', P, P, P, P],
     [P, P, P, P, P, P, P, P],
 ]
+const WAND = [
+    [P, P, P, P, P, P, '#FCD34D', P],
+    [P, P, P, P, P, '#FCD34D', '#FDE68A', '#FCD34D'],
+    [P, P, P, P, '#10B981', '#10B981', P, P],
+    [P, P, P, '#10B981', '#059669', P, P, P],
+    [P, P, '#6D28D9', '#7C3AED', P, P, P, P],
+    [P, '#6D28D9', '#8B5CF6', P, P, P, P, P],
+    ['#4C1D95', '#7C3AED', P, P, P, P, P, P],
+    ['#4C1D95', P, P, P, P, P, P, P],
+]
 
 const Px = ({ grid, size = 5 }) => (
     <svg
@@ -47,12 +57,6 @@ const Px = ({ grid, size = 5 }) => (
     </svg>
 )
 
-/* ─────────────────────────────────────────────
-   Group SSE segments into page spreads.
-   A spread is complete when it has a resolved image URL.
-   A spread is pending when it has image_loading.
-   A spread is text-only when no image at all (final page).
-───────────────────────────────────────────── */
 function toSpreads(segments) {
     const out = []
     let texts = []
@@ -69,10 +73,7 @@ function toSpreads(segments) {
             texts = []
         }
     }
-    // trailing text (last page, no image yet)
-    if (texts.length) {
-        out.push({ text: texts.join(''), image: null, loading: false, id: 'final' })
-    }
+    if (texts.length) out.push({ text: texts.join(''), image: null, loading: false, id: 'final' })
     return out
 }
 
@@ -102,7 +103,6 @@ const STYLES = `
     0%,80%,100% { transform:translateY(0);   }
     40%         { transform:translateY(-6px); }
   }
-  /* smooth slide-fade page turns */
   @keyframes exitLeft {
     from { opacity:1; transform:translateX(0);     }
     to   { opacity:0; transform:translateX(-30px); }
@@ -119,10 +119,13 @@ const STYLES = `
     from { opacity:0; transform:translateX(-30px); }
     to   { opacity:1; transform:translateX(0);     }
   }
-  /* image reveal — fades in when src loads */
   @keyframes imgReveal {
     from { opacity:0; transform:scale(.97); }
     to   { opacity:1; transform:scale(1);   }
+  }
+  @keyframes audioWave {
+    0%,100% { transform:scaleY(.4); }
+    50%     { transform:scaleY(1);  }
   }
 
   .anim-bookUp   { animation: bookUp .5s ease both; }
@@ -150,12 +153,54 @@ const STYLES = `
   .gen-dot  { animation: genDot 1.2s ease-in-out infinite; display:inline-block; }
   .gen-dot:nth-child(2) { animation-delay:.18s; }
   .gen-dot:nth-child(3) { animation-delay:.36s; }
+
+  .audio-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border: 1.5px solid #EDE9FE;
+    border-radius: 16px;
+    padding: 10px 18px;
+    box-shadow: 0 2px 0 #EDE9FE, 0 6px 20px rgba(109,40,217,.07);
+    max-width: 900px;
+    margin: 14px auto 0;
+  }
+  .audio-wave-bar {
+    width: 3px;
+    border-radius: 3px;
+    background: #A78BFA;
+    display: inline-block;
+  }
+  .audio-wave-bar.playing {
+    animation: audioWave .7s ease-in-out infinite;
+  }
+  .audio-wave-bar:nth-child(2) { animation-delay:.1s; height:10px; }
+  .audio-wave-bar:nth-child(3) { animation-delay:.2s; height:16px; }
+  .audio-wave-bar:nth-child(4) { animation-delay:.3s; height:10px; }
+  .audio-wave-bar:nth-child(5) { animation-delay:.15s; height:14px; }
+
+  .audio-btn {
+    border: none; cursor: pointer; border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; transition: transform .1s, box-shadow .1s;
+    flex-shrink: 0;
+  }
+  .audio-btn:active { transform: scale(.92); }
+  .audio-btn-play {
+    background: linear-gradient(135deg,#7C3AED,#4C1D95);
+    color: #EDE9FE;
+    box-shadow: 0 3px 0 #3B0764;
+  }
+  .audio-btn-replay {
+    background: #EDE9FE;
+    color: #6D28D9;
+    box-shadow: 0 3px 0 #C4B5FD;
+  }
 `
 
-/* ─────────────────────────────────────────────
-   PageSpread — isolated so only it re-mounts
-   on displayIdx change. key prop does the work.
-───────────────────────────────────────────── */
+/* ── PageSpread — isolated component, key prop forces clean remount ── */
 function PageSpread({ spread, idx, enterClass, creativeNote, isGenerating, isLastSpread }) {
     return (
         <div
@@ -179,7 +224,6 @@ function PageSpread({ spread, idx, enterClass, creativeNote, isGenerating, isLas
                     Page {idx + 1}
                 </div>
 
-                {/* Image: resolved → show with reveal anim */}
                 {spread?.image ? (
                     <img
                         src={spread.image}
@@ -193,7 +237,6 @@ function PageSpread({ spread, idx, enterClass, creativeNote, isGenerating, isLas
                         onError={e => { e.target.style.display = 'none' }}
                     />
                 ) : spread?.loading ? (
-                    /* Image generating — skeleton with status label */
                     <div style={{ width: '100%' }}>
                         <div className="skel" style={{ height: 190 }} />
                         <div style={{
@@ -210,7 +253,6 @@ function PageSpread({ spread, idx, enterClass, creativeNote, isGenerating, isLas
                         </div>
                     </div>
                 ) : isGenerating && isLastSpread ? (
-                    /* Text-only trailing spread — still writing */
                     <div style={{
                         width: '100%', height: 190, borderRadius: 12,
                         background: '#EDE9FE', border: '1.5px dashed #C4B5FD',
@@ -229,7 +271,6 @@ function PageSpread({ spread, idx, enterClass, creativeNote, isGenerating, isLas
                         </div>
                     </div>
                 ) : (
-                    /* Static placeholder for text-only final page */
                     <div style={{
                         width: '100%', height: 190, borderRadius: 12,
                         background: '#EDE9FE', border: '1.5px dashed #C4B5FD',
@@ -262,13 +303,10 @@ function PageSpread({ spread, idx, enterClass, creativeNote, isGenerating, isLas
                     minHeight: 440, position: 'relative',
                 }}
             >
-                {spread?.text ? (
-                    <p style={{ margin: 0 }}>{spread.text}</p>
-                ) : (
-                    <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>
-                        The adventure continues...
-                    </span>
-                )}
+                {spread?.text
+                    ? <p style={{ margin: 0 }}>{spread.text}</p>
+                    : <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>The adventure continues...</span>
+                }
 
                 {creativeNote && idx === 0 && (
                     <div style={{
@@ -294,22 +332,79 @@ function PageSpread({ spread, idx, enterClass, creativeNote, isGenerating, isLas
     )
 }
 
-/* ─────────────────────────────────────────────
-   Main component
-───────────────────────────────────────────── */
+/* ── AudioBar — shown inside the open book ── */
+function AudioBar({ isPlaying, hasAudio, currentPage, totalPages, onToggle, onReplay }) {
+    if (!hasAudio && !isPlaying) return null
+    return (
+        <div className="audio-bar">
+            {/* waveform indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 20 }}>
+                {[12, 16, 10, 14, 10].map((h, i) => (
+                    <div
+                        key={i}
+                        className={`audio-wave-bar${isPlaying ? ' playing' : ''}`}
+                        style={{ height: h }}
+                    />
+                ))}
+            </div>
+
+            {/* label */}
+            <div style={{ flex: 1 }}>
+                <div style={{
+                    fontFamily: "'Jersey 10',monospace", fontSize: 14,
+                    color: '#6D28D9', letterSpacing: '1px',
+                }}>
+                    {isPlaying ? 'Narrating...' : 'Narration ready'}
+                </div>
+                {currentPage > 0 && (
+                    <div style={{
+                        fontFamily: "'DM Sans',sans-serif", fontSize: 11,
+                        color: '#9CA3AF', fontWeight: 500, marginTop: 1,
+                    }}>
+                        Page {currentPage} of {totalPages}
+                    </div>
+                )}
+            </div>
+
+            {/* replay button */}
+            <button
+                className="audio-btn audio-btn-replay"
+                onClick={onReplay}
+                title="Replay current narration"
+            >
+                ↺
+            </button>
+
+            {/* play / pause button */}
+            <button
+                className="audio-btn audio-btn-play"
+                onClick={onToggle}
+                title={isPlaying ? 'Pause narration' : 'Play narration'}
+            >
+                {isPlaying ? '⏸' : '▶'}
+            </button>
+        </div>
+    )
+}
+
+/* ── Main StoryBook ── */
 export default function StoryBook({
     segments, done, brief, creativeNote,
     isGenerating, onNewStory, onViewHistory,
     storyKey,
-    currentAudioPage,   /* passed from App: index of page whose audio is playing */
+    currentAudioPage,
+    isAudioPlaying,
+    hasAudio,
+    onToggleAudio,
+    onReplayAudio,
 }) {
     const [bookOpen, setBookOpen] = useState(false)
     const [isOpening, setIsOpening] = useState(false)
-    const [displayIdx, setDisplayIdx] = useState(0)   // what the user sees
-    const [targetIdx, setTargetIdx] = useState(0)   // where we want to go
+    const [displayIdx, setDisplayIdx] = useState(0)
+    const [targetIdx, setTargetIdx] = useState(0)
     const [enterClass, setEnterClass] = useState('pg-enterRight')
     const [flipping, setFlipping] = useState(false)
-    const autoAdvanceRef = useRef(true)   // false once user manually flips
+    const autoAdvanceRef = useRef(true)
 
     /* reset on new story */
     useEffect(() => {
@@ -324,12 +419,10 @@ export default function StoryBook({
 
     /* open book immediately when generation starts */
     useEffect(() => {
-        if (isGenerating && !bookOpen) {
-            setBookOpen(true)
-        }
+        if (isGenerating && !bookOpen) setBookOpen(true)
     }, [isGenerating])
 
-    /* open book with animation when done (if not already open) */
+    /* open book with cover animation when done (library load) */
     useEffect(() => {
         if (done && !bookOpen && !isOpening) {
             const t = setTimeout(() => {
@@ -342,64 +435,38 @@ export default function StoryBook({
 
     const spreads = toSpreads(segments)
 
-    /*
-      Auto-advance during generation:
-      When a new complete spread appears (has resolved image),
-      and user hasn't manually navigated,
-      and audio for the current page has finished (or no audio tracking),
-      move to the next complete spread.
-  
-      "Complete" = has a real image URL (not loading, not null).
-      We wait for image because image = the page is fully ready to read.
-    */
+    /* auto-advance: only when image is resolved AND audio for that page finished */
     useEffect(() => {
-        if (!isGenerating || !autoAdvanceRef.current) return
-        if (flipping) return
-
-        // find the last spread with a resolved image
+        if (!isGenerating || !autoAdvanceRef.current || flipping) return
         let lastComplete = -1
         for (let i = 0; i < spreads.length; i++) {
             if (spreads[i].image) lastComplete = i
         }
         if (lastComplete < 0) return
-
-        // if audio page tracking is available, don't advance past what's been read
-        const audioGate = currentAudioPage != null
+        const gate = currentAudioPage != null
             ? Math.min(lastComplete, currentAudioPage)
             : lastComplete
-
-        if (audioGate > displayIdx) {
-            // advance one page at a time
-            const next = displayIdx + 1
-            if (next <= audioGate) {
-                doFlip(next, 'next')
-            }
-        }
+        if (gate > displayIdx) doFlip(displayIdx + 1, 'next')
     }, [spreads.length, spreads.map(s => s.image).join(','), currentAudioPage])
 
-    /* internal flip executor */
     const doFlip = (next, dir) => {
         if (flipping) return
         setFlipping(true)
         setTargetIdx(next)
         const exitCls = dir === 'next' ? 'pg-exitLeft' : 'pg-exitRight'
         const enterCls = dir === 'next' ? 'pg-enterRight' : 'pg-enterLeft'
-        // play exit on current
         setEnterClass(exitCls)
         setTimeout(() => {
             setDisplayIdx(next)
             setEnterClass(enterCls)
-            setTimeout(() => {
-                setFlipping(false)
-                setEnterClass('')
-            }, 270)
+            setTimeout(() => { setFlipping(false); setEnterClass('') }, 270)
         }, 225)
     }
 
     const flip = (dir) => {
         const next = dir === 'next' ? displayIdx + 1 : displayIdx - 1
         if (next < 0 || next >= spreads.length || flipping) return
-        autoAdvanceRef.current = false   // user took control
+        autoAdvanceRef.current = false
         doFlip(next, dir)
     }
 
@@ -412,81 +479,43 @@ export default function StoryBook({
     const spread = spreads[displayIdx]
     const isLastSpread = displayIdx === spreads.length - 1
 
-    /* ═══════════════════════════════════════
-       PRE-OPEN: only shown if done=false AND
-       generation hasn't started yet.
-       (Normally skipped — book opens as soon
-        as generation begins.)
-    ═══════════════════════════════════════ */
+    /* ── fallback / error ── */
     if (!isGenerating && !done && !bookOpen) return (
         <div style={{ maxWidth: 500, margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
             <style>{STYLES}</style>
             <div style={{ marginBottom: 20 }}><Px grid={DRAGON} size={8} /></div>
-            <div style={{
-                fontFamily: "'Jersey 10',monospace", fontSize: 26,
-                color: '#6D28D9', letterSpacing: '1.5px', marginBottom: 10,
-            }}>
+            <div style={{ fontFamily: "'Jersey 10',monospace", fontSize: 26, color: '#6D28D9', letterSpacing: '1.5px', marginBottom: 10 }}>
                 Hmm, something went wrong
             </div>
-            <div style={{
-                fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF',
-                fontSize: 15, fontWeight: 500, marginBottom: 28, lineHeight: 1.7,
-            }}>
+            <div style={{ fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF', fontSize: 15, fontWeight: 500, marginBottom: 28, lineHeight: 1.7 }}>
                 Could not reach the backend.<br />
                 Check your{' '}
-                <code style={{ background: '#EDE9FE', padding: '2px 7px', borderRadius: 6, color: '#6D28D9', fontSize: 13 }}>
-                    VITE_BACKEND_URL
-                </code>
+                <code style={{ background: '#EDE9FE', padding: '2px 7px', borderRadius: 6, color: '#6D28D9', fontSize: 13 }}>VITE_BACKEND_URL</code>
             </div>
-            <button
-                onClick={onNewStory}
+            <button onClick={onNewStory}
                 style={{
                     fontFamily: "'Jersey 10',monospace", fontSize: 18, letterSpacing: '1px',
-                    background: 'linear-gradient(135deg,#6D28D9,#4C1D95)',
-                    color: '#EDE9FE', border: 'none', borderRadius: 14,
-                    padding: '12px 36px', cursor: 'pointer', boxShadow: '0 5px 0 #3B0764',
-                }}
-            >
+                    background: 'linear-gradient(135deg,#6D28D9,#4C1D95)', color: '#EDE9FE',
+                    border: 'none', borderRadius: 14, padding: '12px 36px', cursor: 'pointer', boxShadow: '0 5px 0 #3B0764'
+                }}>
                 ← Back to Form
             </button>
         </div>
     )
 
-    /* ═══════════════════════════════════════
-       COVER: only shown when done=true and
-       book hasn't opened yet (library load)
-    ═══════════════════════════════════════ */
+    /* ── cover (library load — done but book not opened) ── */
     if (done && !bookOpen) return (
-        <div className="anim-bookUp" style={{
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', padding: '44px 20px',
-        }}>
+        <div className="anim-bookUp" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '44px 20px' }}>
             <style>{STYLES}</style>
-            <div style={{
-                fontFamily: "'Jersey 10',monospace", fontSize: 34,
-                color: '#6D28D9', letterSpacing: '2px', marginBottom: 4,
-            }}>
+            <div style={{ fontFamily: "'Jersey 10',monospace", fontSize: 34, color: '#6D28D9', letterSpacing: '2px', marginBottom: 4 }}>
                 ✨ Story Complete!
             </div>
-            <div style={{
-                fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF',
-                fontSize: 15, fontWeight: 500, marginBottom: 48,
-            }}>
+            <div style={{ fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF', fontSize: 15, fontWeight: 500, marginBottom: 48 }}>
                 {spreads.length} pages · tap to open
             </div>
 
-            <div
-                style={{
-                    position: 'relative', width: 240, height: 340,
-                    cursor: isOpening ? 'default' : 'pointer', marginBottom: 44,
-                }}
-                onClick={() => {
-                    if (!isOpening) {
-                        setIsOpening(true)
-                        setTimeout(() => setBookOpen(true), 1500)
-                    }
-                }}
-            >
+            <div style={{ position: 'relative', width: 240, height: 340, cursor: isOpening ? 'default' : 'pointer', marginBottom: 44 }}
+                onClick={() => { if (!isOpening) { setIsOpening(true); setTimeout(() => setBookOpen(true), 1500) } }}>
                 <div style={{ position: 'absolute', left: 8, top: 4, width: '100%', height: '100%', background: '#F0EBE3', borderRadius: '4px 14px 14px 4px', boxShadow: '3px 5px 18px rgba(0,0,0,.1)' }} />
                 <div style={{ position: 'absolute', left: 4, top: 2, width: '100%', height: '100%', background: '#FBF7F2', borderRadius: '4px 14px 14px 4px' }} />
                 {isOpening && (
@@ -494,17 +523,14 @@ export default function StoryBook({
                         <Px grid={STAR} size={11} />
                     </div>
                 )}
-                <div
-                    className={isOpening ? 'cover-flip' : ''}
+                <div className={isOpening ? 'cover-flip' : ''}
                     style={{
                         position: 'absolute', inset: 0,
                         background: 'linear-gradient(145deg,#6D28D9,#4C1D95 60%,#3B0764)',
                         borderRadius: '4px 14px 14px 4px',
                         boxShadow: isOpening ? 'none' : '-4px 0 0 #3B0764, 6px 7px 28px rgba(109,40,217,.35)',
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center', gap: 12, padding: 26,
-                    }}
-                >
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 26
+                    }}>
                     <div style={{ position: 'absolute', top: 10, left: 10, opacity: .35 }}><Px grid={STAR} size={3} /></div>
                     <div style={{ position: 'absolute', bottom: 10, right: 10, opacity: .25 }}><Px grid={STAR} size={3} /></div>
                     <Px grid={DRAGON} size={7} />
@@ -520,18 +546,15 @@ export default function StoryBook({
             </div>
 
             {!isOpening ? (
-                <button
-                    onClick={() => { setIsOpening(true); setTimeout(() => setBookOpen(true), 1500) }}
+                <button onClick={() => { setIsOpening(true); setTimeout(() => setBookOpen(true), 1500) }}
                     style={{
                         fontFamily: "'Jersey 10',monospace", fontSize: 20, letterSpacing: '1.5px',
-                        background: 'linear-gradient(135deg,#6D28D9,#4C1D95)',
-                        color: '#EDE9FE', border: 'none', borderRadius: 16,
-                        padding: '13px 44px', cursor: 'pointer',
-                        boxShadow: '0 6px 0 #3B0764, 0 14px 30px rgba(109,40,217,.28)',
+                        background: 'linear-gradient(135deg,#6D28D9,#4C1D95)', color: '#EDE9FE',
+                        border: 'none', borderRadius: 16, padding: '13px 44px', cursor: 'pointer',
+                        boxShadow: '0 6px 0 #3B0764, 0 14px 30px rgba(109,40,217,.28)'
                     }}
                     onMouseDown={e => { e.currentTarget.style.transform = 'translateY(5px)'; e.currentTarget.style.boxShadow = '0 1px 0 #3B0764' }}
-                    onMouseUp={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 6px 0 #3B0764, 0 14px 30px rgba(109,40,217,.28)' }}
-                >
+                    onMouseUp={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 6px 0 #3B0764, 0 14px 30px rgba(109,40,217,.28)' }}>
                     📖 Open Your Story
                 </button>
             ) : (
@@ -542,15 +565,12 @@ export default function StoryBook({
         </div>
     )
 
-    /* ═══════════════════════════════════════
-       OPEN BOOK — used during generation AND
-       after generation completes.
-    ═══════════════════════════════════════ */
+    /* ── open book (generation + reading) ── */
     return (
         <div style={{ padding: '24px 12px 52px' }} className="anim-bookUp">
             <style>{STYLES}</style>
 
-            {/* Title bar */}
+            {/* title */}
             <div style={{ textAlign: 'center', marginBottom: 20 }}>
                 <div style={{ fontFamily: "'Jersey 10',monospace", fontSize: 26, color: '#6D28D9', letterSpacing: '1.5px', marginBottom: 2 }}>
                     {brief.child_name || 'My'}'s Storybook
@@ -559,10 +579,9 @@ export default function StoryBook({
                     Page {displayIdx + 1} of {spreads.length || '…'}
                     {isGenerating && (
                         <span style={{
-                            background: '#EDE9FE', color: '#6D28D9',
-                            border: '1px solid #C4B5FD', borderRadius: 50,
+                            background: '#EDE9FE', color: '#6D28D9', border: '1px solid #C4B5FD', borderRadius: 50,
                             padding: '2px 10px', fontSize: 11, fontWeight: 600,
-                            display: 'inline-flex', alignItems: 'center', gap: 5,
+                            display: 'inline-flex', alignItems: 'center', gap: 5
                         }}>
                             <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6D28D9', display: 'inline-block', animation: 'floatY 1s ease-in-out infinite' }} />
                             Generating
@@ -571,12 +590,11 @@ export default function StoryBook({
                 </div>
             </div>
 
-            {/* Book shell — static container, never re-renders */}
+            {/* book shell */}
             <div style={{
-                maxWidth: 900, margin: '0 auto', minHeight: 460,
-                position: 'relative', overflow: 'hidden',
-                borderRadius: '6px 20px 20px 6px',
-                boxShadow: '-5px 0 0 #C4B5FD, 10px 12px 44px rgba(109,40,217,.12)',
+                maxWidth: 900, margin: '0 auto', minHeight: 460, position: 'relative',
+                overflow: 'hidden', borderRadius: '6px 20px 20px 6px',
+                boxShadow: '-5px 0 0 #C4B5FD, 10px 12px 44px rgba(109,40,217,.12)'
             }}>
                 {spreads.length > 0 ? (
                     <PageSpread
@@ -589,12 +607,10 @@ export default function StoryBook({
                         isLastSpread={isLastSpread}
                     />
                 ) : (
-                    /* Very first page — nothing built yet, show waiting state */
                     <div style={{
-                        display: 'flex', width: '100%', minHeight: 460,
-                        alignItems: 'center', justifyContent: 'center',
-                        background: 'linear-gradient(to right,#F5F3FF,#FFFDF7)',
-                        flexDirection: 'column', gap: 16,
+                        display: 'flex', width: '100%', minHeight: 460, alignItems: 'center',
+                        justifyContent: 'center', background: 'linear-gradient(to right,#F5F3FF,#FFFDF7)',
+                        flexDirection: 'column', gap: 16
                     }}>
                         <div className="float-it"><Px grid={DRAGON} size={9} /></div>
                         <div style={{ fontFamily: "'Jersey 10',monospace", fontSize: 22, color: '#6D28D9', letterSpacing: '1.5px' }}>
@@ -610,14 +626,22 @@ export default function StoryBook({
                 )}
             </div>
 
-            {/* Navigation */}
+            {/* ── AUDIO BAR ── */}
+            <AudioBar
+                isPlaying={isAudioPlaying}
+                hasAudio={hasAudio}
+                currentPage={currentAudioPage}
+                totalPages={spreads.length}
+                onToggle={onToggleAudio}
+                onReplay={onReplayAudio}
+            />
+
+            {/* navigation */}
             <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: 14, maxWidth: 900, margin: '22px auto 0',
+                gap: 14, maxWidth: 900, margin: '16px auto 0'
             }}>
-                <button
-                    onClick={() => flip('prev')}
-                    disabled={displayIdx === 0 || flipping}
+                <button onClick={() => flip('prev')} disabled={displayIdx === 0 || flipping}
                     style={{
                         fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
                         background: displayIdx === 0 ? '#F5F3FF' : 'white',
@@ -626,39 +650,30 @@ export default function StoryBook({
                         borderRadius: 12, padding: '10px 26px',
                         cursor: displayIdx === 0 ? 'not-allowed' : 'pointer',
                         boxShadow: displayIdx === 0 ? 'none' : '0 4px 0 #DDD6FE',
-                        transition: 'all .15s',
-                    }}
-                >
+                        transition: 'all .15s'
+                    }}>
                     ← Prev
                 </button>
 
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                     {spreads.map((_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => jumpTo(i)}
+                        <button key={i} onClick={() => jumpTo(i)}
                             style={{
-                                width: i === displayIdx ? 20 : 8, height: 8,
-                                borderRadius: 4, border: 'none', padding: 0,
+                                width: i === displayIdx ? 20 : 8, height: 8, borderRadius: 4,
+                                border: 'none', padding: 0,
                                 cursor: i === displayIdx ? 'default' : 'pointer',
                                 background: i === displayIdx ? '#6D28D9'
-                                    : spreads[i]?.image ? '#A78BFA'   /* complete */
-                                        : spreads[i]?.loading ? '#DDD6FE' /* painting */
-                                            : '#E5E7EB',                       /* text only */
-                                transition: 'all .2s',
+                                    : spreads[i]?.image ? '#A78BFA'
+                                        : spreads[i]?.loading ? '#DDD6FE'
+                                            : '#E5E7EB',
+                                transition: 'all .2s'
                             }}
-                            title={
-                                spreads[i]?.image ? `Page ${i + 1} ready` :
-                                    spreads[i]?.loading ? `Page ${i + 1} painting…` :
-                                        `Page ${i + 1}`
-                            }
+                            title={spreads[i]?.image ? `Page ${i + 1} ready` : spreads[i]?.loading ? `Page ${i + 1} painting…` : `Page ${i + 1}`}
                         />
                     ))}
                 </div>
 
-                <button
-                    onClick={() => flip('next')}
-                    disabled={displayIdx >= spreads.length - 1 || flipping}
+                <button onClick={() => flip('next')} disabled={displayIdx >= spreads.length - 1 || flipping}
                     style={{
                         fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
                         background: displayIdx >= spreads.length - 1 ? '#F5F3FF' : '#6D28D9',
@@ -666,19 +681,18 @@ export default function StoryBook({
                         border: 'none', borderRadius: 12, padding: '10px 26px',
                         cursor: displayIdx >= spreads.length - 1 ? 'not-allowed' : 'pointer',
                         boxShadow: displayIdx >= spreads.length - 1 ? 'none' : '0 5px 0 #3B0764',
-                        transition: 'all .15s',
-                    }}
-                >
+                        transition: 'all .15s'
+                    }}>
                     Next →
                 </button>
             </div>
 
-            {/* Dot legend during generation */}
+            {/* dot legend during generation */}
             {isGenerating && (
                 <div style={{
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    gap: 16, marginTop: 10,
-                    fontFamily: "'DM Sans',sans-serif", fontSize: 11, color: '#9CA3AF', fontWeight: 500,
+                    gap: 16, marginTop: 10, fontFamily: "'DM Sans',sans-serif",
+                    fontSize: 11, color: '#9CA3AF', fontWeight: 500
                 }}>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
                         <span style={{ width: 8, height: 8, borderRadius: 4, background: '#A78BFA', display: 'inline-block' }} /> Ready
@@ -692,35 +706,29 @@ export default function StoryBook({
                 </div>
             )}
 
-            {/* Action buttons — only after done */}
+            {/* action buttons — only after done */}
             {done && (
-                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 28, flexWrap: 'wrap' }}>
-                    <button
-                        onClick={onNewStory}
+                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 24, flexWrap: 'wrap' }}>
+                    <button onClick={onNewStory}
                         style={{
                             fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
-                            background: '#D1FAE5', color: '#047857',
-                            border: '1.5px solid #A7F3D0', borderRadius: 14,
-                            padding: '11px 28px', cursor: 'pointer',
-                            boxShadow: '0 4px 0 #A7F3D0', transition: 'transform .1s',
+                            background: '#D1FAE5', color: '#047857', border: '1.5px solid #A7F3D0',
+                            borderRadius: 14, padding: '11px 28px', cursor: 'pointer',
+                            boxShadow: '0 4px 0 #A7F3D0', transition: 'transform .1s'
                         }}
                         onMouseDown={e => e.currentTarget.style.transform = 'translateY(3px)'}
-                        onMouseUp={e => e.currentTarget.style.transform = ''}
-                    >
+                        onMouseUp={e => e.currentTarget.style.transform = ''}>
                         ✨ New Story
                     </button>
-                    <button
-                        onClick={onViewHistory}
+                    <button onClick={onViewHistory}
                         style={{
                             fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
-                            background: '#DBEAFE', color: '#1D4ED8',
-                            border: '1.5px solid #BFDBFE', borderRadius: 14,
-                            padding: '11px 28px', cursor: 'pointer',
-                            boxShadow: '0 4px 0 #BFDBFE', transition: 'transform .1s',
+                            background: '#DBEAFE', color: '#1D4ED8', border: '1.5px solid #BFDBFE',
+                            borderRadius: 14, padding: '11px 28px', cursor: 'pointer',
+                            boxShadow: '0 4px 0 #BFDBFE', transition: 'transform .1s'
                         }}
                         onMouseDown={e => e.currentTarget.style.transform = 'translateY(3px)'}
-                        onMouseUp={e => e.currentTarget.style.transform = ''}
-                    >
+                        onMouseUp={e => e.currentTarget.style.transform = ''}>
                         📚 Library
                     </button>
                 </div>

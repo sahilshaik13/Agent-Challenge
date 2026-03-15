@@ -262,6 +262,8 @@ export default function App() {
   const [creativeNote, setCreativeNote] = useState('')
   const [storyId, setStoryId] = useState(null)
   const [currentAudioPage, setCurrentAudioPage] = useState(0)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const currentAudioRef = useRef(null)
 
   const audioQ = useRef([])
   const playing = useRef(false)
@@ -290,19 +292,59 @@ export default function App() {
 
   /* audio queue */
   const playNext = () => {
-    if (!audioQ.current.length) { playing.current = false; return }
+    if (!audioQ.current.length) {
+      playing.current = false
+      setIsAudioPlaying(false)
+      return
+    }
     playing.current = true
     const { url, pageIdx } = audioQ.current.shift()
     setCurrentAudioPage(pageIdx)
     const a = new Audio(url)
+    currentAudioRef.current = a
     a.onended = playNext
     a.onerror = playNext
-    a.play().catch(playNext)
+    a.play()
+      .then(() => setIsAudioPlaying(true))
+      .catch(playNext)
   }
 
   const queueAudio = (url, pageIdx = 0) => {
     audioQ.current.push({ url, pageIdx })
-    if (!playing.current) playNext()
+    // do NOT auto-play — user presses play
+  }
+
+  const toggleAudio = () => {
+    const a = currentAudioRef.current
+    if (!a && audioQ.current.length > 0) {
+      // nothing playing yet, start the queue
+      playNext()
+      return
+    }
+    if (!a) return
+    if (a.paused) {
+      a.play().then(() => setIsAudioPlaying(true)).catch(() => { })
+    } else {
+      a.pause()
+      setIsAudioPlaying(false)
+    }
+  }
+
+  const replayAudio = () => {
+    const a = currentAudioRef.current
+    if (!a) return
+    a.pause()
+    a.currentTime = 0
+    a.play().then(() => setIsAudioPlaying(true)).catch(() => { })
+  }
+
+  const stopAllAudio = () => {
+    const a = currentAudioRef.current
+    if (a) { a.pause(); a.currentTime = 0 }
+    audioQ.current = []
+    playing.current = false
+    setIsAudioPlaying(false)
+    currentAudioRef.current = null
   }
 
   /* voice */
@@ -372,6 +414,7 @@ export default function App() {
 
   /* new story */
   const newStory = () => {
+    stopAllAudio()                    // ← add this line
     setSegments([]); setDone(false); setError(''); setPageCount(0); setStoryId(null)
     setCreativeNote(''); clearCurrentStory()
     setBrief({ child_name: '', story_topic: '', style: 'watercolor', age_group: '6-8', characters: [], voice_transcript: '' })
@@ -604,6 +647,10 @@ export default function App() {
             onViewHistory={() => setView('history')}
             storyKey={storyId}
             currentAudioPage={currentAudioPage}
+            isAudioPlaying={isAudioPlaying}
+            hasAudio={audioQ.current.length > 0 || currentAudioRef.current !== null}
+            onToggleAudio={toggleAudio}
+            onReplayAudio={replayAudio}
           />
         </div>
       )}
