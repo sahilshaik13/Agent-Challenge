@@ -5,7 +5,6 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080'
 const STORAGE_KEY_CURRENT = 'gs_current_story'
 const STORAGE_KEY_HISTORY = 'gs_story_history'
 const MAX_HISTORY = 20
-
 /* ─── STORAGE HELPERS ─── */
 const saveCurrentStory = (d) => { try { localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(d)) } catch { } }
 const loadCurrentStory = () => { try { const d = localStorage.getItem(STORAGE_KEY_CURRENT); return d ? JSON.parse(d) : null } catch { return null } }
@@ -262,6 +261,9 @@ export default function App() {
   const [pageCount, setPageCount] = useState(0)
   const [creativeNote, setCreativeNote] = useState('')
   const [storyId, setStoryId] = useState(null)
+  const [currentAudioPage, setCurrentAudioPage] = useState(0)
+  const [isAudioPlaying, setIsAudioPlaying] = useState(false)
+  const currentAudioRef = useRef(null)
 
   const audioQ = useRef([])
   const playing = useRef(false)
@@ -290,13 +292,60 @@ export default function App() {
 
   /* audio queue */
   const playNext = () => {
-    if (!audioQ.current.length) { playing.current = false; return }
+    if (!audioQ.current.length) {
+      playing.current = false
+      setIsAudioPlaying(false)
+      return
+    }
     playing.current = true
-    const a = new Audio(audioQ.current.shift())
-    a.onended = playNext; a.onerror = playNext
-    a.play().catch(playNext)
+    const { url, pageIdx } = audioQ.current.shift()
+    setCurrentAudioPage(pageIdx)
+    const a = new Audio(url)
+    currentAudioRef.current = a
+    a.onended = playNext
+    a.onerror = playNext
+    a.play()
+      .then(() => setIsAudioPlaying(true))
+      .catch(playNext)
   }
-  const queueAudio = (url) => { audioQ.current.push(url); if (!playing.current) playNext() }
+
+  const queueAudio = (url, pageIdx = 0) => {
+    audioQ.current.push({ url, pageIdx })
+    // do NOT auto-play — user presses play
+  }
+
+  const toggleAudio = () => {
+    const a = currentAudioRef.current
+    if (!a && audioQ.current.length > 0) {
+      // nothing playing yet, start the queue
+      playNext()
+      return
+    }
+    if (!a) return
+    if (a.paused) {
+      a.play().then(() => setIsAudioPlaying(true)).catch(() => { })
+    } else {
+      a.pause()
+      setIsAudioPlaying(false)
+    }
+  }
+
+  const replayAudio = () => {
+    const a = currentAudioRef.current
+    if (!a) return
+    a.pause()
+    a.currentTime = 0
+    a.play().then(() => setIsAudioPlaying(true)).catch(() => { })
+  }
+
+  const stopAllAudio = () => {
+    const a = currentAudioRef.current
+    if (a) { a.pause(); a.currentTime = 0 }
+    audioQ.current = []
+    playing.current = false
+    setIsAudioPlaying(false)
+    currentAudioRef.current = null
+  }
 
   /* voice */
   const startVoice = () => {
@@ -346,7 +395,7 @@ export default function App() {
             } else if (ev.type === 'image') {
               setSegments(s => s.map(seg => seg.type === 'image_loading' && seg.index === ev.index ? { type: 'image', url: ev.url, index: ev.index, id: seg.id } : seg)); setPageCount(p => p + 1)
             } else if (ev.type === 'audio') {
-              queueAudio(ev.url)
+              queueAudio(ev.url, pageCount)
             } else if (ev.type === 'done') {
               setDone(true); setIsGenerating(false)
             } else if (ev.type === 'error') { setError(ev.message); setIsGenerating(false) }
@@ -365,6 +414,7 @@ export default function App() {
 
   /* new story */
   const newStory = () => {
+    stopAllAudio()                    // ← add this line
     setSegments([]); setDone(false); setError(''); setPageCount(0); setStoryId(null)
     setCreativeNote(''); clearCurrentStory()
     setBrief({ child_name: '', story_topic: '', style: 'watercolor', age_group: '6-8', characters: [], voice_transcript: '' })
@@ -596,6 +646,11 @@ export default function App() {
             onNewStory={newStory}
             onViewHistory={() => setView('history')}
             storyKey={storyId}
+            currentAudioPage={currentAudioPage}
+            isAudioPlaying={isAudioPlaying}
+            hasAudio={audioQ.current.length > 0 || currentAudioRef.current !== null}
+            onToggleAudio={toggleAudio}
+            onReplayAudio={replayAudio}
           />
         </div>
       )}

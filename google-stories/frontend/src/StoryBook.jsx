@@ -45,12 +45,15 @@ const WAND = [
 const Px = ({ grid, size = 5 }) => (
     <svg
         viewBox={`0 0 ${grid[0].length * size} ${grid.length * size}`}
-        width={grid[0].length * size} height={grid.length * size}
+        width={grid[0].length * size}
+        height={grid.length * size}
         style={{ imageRendering: 'pixelated', display: 'block' }}
     >
-        {grid.map((row, y) => row.map((c, x) =>
-            c ? <rect key={`${x}-${y}`} x={x * size} y={y * size} width={size} height={size} fill={c} /> : null
-        ))}
+        {grid.map((row, y) =>
+            row.map((c, x) =>
+                c ? <rect key={`${x}-${y}`} x={x * size} y={y * size} width={size} height={size} fill={c} /> : null
+            )
+        )}
     </svg>
 )
 
@@ -80,7 +83,7 @@ const STYLES = `
     to   { opacity:1; transform:none; }
   }
   @keyframes flipClose {
-    0%   { transform:perspective(2200px) rotateY(0deg);    opacity:1; }
+    0%   { transform:perspective(2200px) rotateY(0deg); opacity:1; }
     55%  { opacity:1; }
     100% { transform:perspective(2200px) rotateY(-170deg); opacity:0; }
   }
@@ -88,581 +91,648 @@ const STYLES = `
     0%,55% { opacity:0; }
     100%   { opacity:1; }
   }
-  @keyframes genPulse {
-    0%,100% { transform:scaleX(.45); opacity:.4; }
-    50%     { transform:scaleX(1);   opacity:1;  }
-  }
   @keyframes shimmer {
-    0%   { background-position:200% 0;  }
+    0%   { background-position:200% 0; }
     100% { background-position:-200% 0; }
   }
   @keyframes floatY {
-    0%,100% { transform:translateY(0);   }
-    50%     { transform:translateY(-9px);}
+    0%,100% { transform:translateY(0);    }
+    50%     { transform:translateY(-9px); }
   }
-  /* ── smooth slide-fade for page turns — no flicker ── */
-  @keyframes slideOutLeft {
+  @keyframes genDot {
+    0%,80%,100% { transform:translateY(0);   }
+    40%         { transform:translateY(-6px); }
+  }
+  @keyframes exitLeft {
+    from { opacity:1; transform:translateX(0);     }
+    to   { opacity:0; transform:translateX(-30px); }
+  }
+  @keyframes enterRight {
+    from { opacity:0; transform:translateX(30px); }
+    to   { opacity:1; transform:translateX(0);    }
+  }
+  @keyframes exitRight {
     from { opacity:1; transform:translateX(0);    }
-    to   { opacity:0; transform:translateX(-28px);}
+    to   { opacity:0; transform:translateX(30px); }
   }
-  @keyframes slideInRight {
-    from { opacity:0; transform:translateX(28px); }
-    to   { opacity:1; transform:translateX(0);    }
+  @keyframes enterLeft {
+    from { opacity:0; transform:translateX(-30px); }
+    to   { opacity:1; transform:translateX(0);     }
   }
-  @keyframes slideOutRight {
-    from { opacity:1; transform:translateX(0);   }
-    to   { opacity:0; transform:translateX(28px);}
+  @keyframes imgReveal {
+    from { opacity:0; transform:scale(.97); }
+    to   { opacity:1; transform:scale(1);   }
   }
-  @keyframes slideInLeft {
-    from { opacity:0; transform:translateX(-28px);}
-    to   { opacity:1; transform:translateX(0);    }
+  @keyframes audioWave {
+    0%,100% { transform:scaleY(.4); }
+    50%     { transform:scaleY(1);  }
   }
 
-  .anim-bookUp       { animation:bookUp .5s ease both; }
-  .anim-outLeft      { animation:slideOutLeft  .22s ease forwards; }
-  .anim-inRight      { animation:slideInRight  .24s ease both; }
-  .anim-outRight     { animation:slideOutRight .22s ease forwards; }
-  .anim-inLeft       { animation:slideInLeft   .24s ease both; }
-  .anim-visible      { animation:bookUp .4s ease both; }
-  .cover-flip        { transform-origin:left center; animation:flipClose 1.45s cubic-bezier(.4,0,.2,1) forwards; will-change:transform; }
-  .pages-in          { animation:pagesIn 1.45s ease forwards; }
-  .skel              { background:linear-gradient(90deg,#EDE9FE 25%,#F5F3FF 50%,#EDE9FE 75%); background-size:200% 100%; animation:shimmer 1.8s infinite; border-radius:12px; }
-  .book-lines        { background-image:repeating-linear-gradient(to bottom,transparent,transparent 27px,rgba(167,139,250,.13) 27px,rgba(167,139,250,.13) 28px); }
-  .float-it          { animation:floatY 3.2s ease-in-out infinite; }
+  .anim-bookUp   { animation: bookUp .5s ease both; }
+  .cover-flip    { transform-origin:left center; animation:flipClose 1.45s cubic-bezier(.4,0,.2,1) forwards; will-change:transform; }
+  .pages-in      { animation: pagesIn 1.45s ease forwards; }
+  .pg-exitLeft   { animation: exitLeft   220ms ease forwards; }
+  .pg-exitRight  { animation: exitRight  220ms ease forwards; }
+  .pg-enterRight { animation: enterRight 260ms ease both; }
+  .pg-enterLeft  { animation: enterLeft  260ms ease both; }
+  .img-reveal    { animation: imgReveal  400ms ease both; }
+  .skel          {
+    background: linear-gradient(90deg,#EDE9FE 25%,#F5F3FF 50%,#EDE9FE 75%);
+    background-size: 200% 100%;
+    animation: shimmer 1.8s infinite;
+    border-radius: 12px;
+  }
+  .book-lines {
+    background-image: repeating-linear-gradient(
+      to bottom,
+      transparent, transparent 27px,
+      rgba(167,139,250,.13) 27px, rgba(167,139,250,.13) 28px
+    );
+  }
+  .float-it { animation: floatY 3.2s ease-in-out infinite; }
+  .gen-dot  { animation: genDot 1.2s ease-in-out infinite; display:inline-block; }
+  .gen-dot:nth-child(2) { animation-delay:.18s; }
+  .gen-dot:nth-child(3) { animation-delay:.36s; }
 
-  /* make the spread container clip overflow so slides don't bleed */
-  .spread-wrap {
-    overflow: hidden;
-    border-radius: 6px 20px 20px 6px;
-    will-change: contents;
+  .audio-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: white;
+    border: 1.5px solid #EDE9FE;
+    border-radius: 16px;
+    padding: 10px 18px;
+    box-shadow: 0 2px 0 #EDE9FE, 0 6px 20px rgba(109,40,217,.07);
+    max-width: 900px;
+    margin: 14px auto 0;
+  }
+  .audio-wave-bar {
+    width: 3px;
+    border-radius: 3px;
+    background: #A78BFA;
+    display: inline-block;
+  }
+  .audio-wave-bar.playing {
+    animation: audioWave .7s ease-in-out infinite;
+  }
+  .audio-wave-bar:nth-child(2) { animation-delay:.1s; height:10px; }
+  .audio-wave-bar:nth-child(3) { animation-delay:.2s; height:16px; }
+  .audio-wave-bar:nth-child(4) { animation-delay:.3s; height:10px; }
+  .audio-wave-bar:nth-child(5) { animation-delay:.15s; height:14px; }
+
+  .audio-btn {
+    border: none; cursor: pointer; border-radius: 50%;
+    width: 36px; height: 36px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; transition: transform .1s, box-shadow .1s;
+    flex-shrink: 0;
+  }
+  .audio-btn:active { transform: scale(.92); }
+  .audio-btn-play {
+    background: linear-gradient(135deg,#7C3AED,#4C1D95);
+    color: #EDE9FE;
+    box-shadow: 0 3px 0 #3B0764;
+  }
+  .audio-btn-replay {
+    background: #EDE9FE;
+    color: #6D28D9;
+    box-shadow: 0 3px 0 #C4B5FD;
   }
 `
 
+/* ── PageSpread — isolated component, key prop forces clean remount ── */
+function PageSpread({ spread, idx, enterClass, creativeNote, isGenerating, isLastSpread }) {
+    return (
+        <div
+            className={enterClass}
+            style={{ display: 'flex', width: '100%', minHeight: 460 }}
+        >
+            {/* LEFT — illustration */}
+            <div style={{
+                flex: '0 0 44%',
+                background: '#F5F3FF',
+                borderRight: '2px solid rgba(196,181,253,.28)',
+                padding: '32px 22px',
+                display: 'flex', flexDirection: 'column',
+                alignItems: 'center', justifyContent: 'center', gap: 14,
+            }}>
+                <div style={{
+                    fontFamily: "'Jersey 10',monospace",
+                    fontSize: 12, color: '#A78BFA',
+                    letterSpacing: '2px', textTransform: 'uppercase',
+                }}>
+                    Page {idx + 1}
+                </div>
+
+                {spread?.image ? (
+                    <img
+                        src={spread.image}
+                        alt={`Illustration ${idx + 1}`}
+                        className="img-reveal"
+                        style={{
+                            width: '100%', borderRadius: 12,
+                            boxShadow: '0 4px 20px rgba(109,40,217,.14)',
+                            display: 'block',
+                        }}
+                        onError={e => { e.target.style.display = 'none' }}
+                    />
+                ) : spread?.loading ? (
+                    <div style={{ width: '100%' }}>
+                        <div className="skel" style={{ height: 190 }} />
+                        <div style={{
+                            fontFamily: "'Jersey 10',monospace", fontSize: 12,
+                            color: '#A78BFA', textAlign: 'center',
+                            marginTop: 10, letterSpacing: '1px',
+                            display: 'flex', alignItems: 'center',
+                            justifyContent: 'center', gap: 6,
+                        }}>
+                            Painting
+                            <span className="gen-dot">·</span>
+                            <span className="gen-dot">·</span>
+                            <span className="gen-dot">·</span>
+                        </div>
+                    </div>
+                ) : isGenerating && isLastSpread ? (
+                    <div style={{
+                        width: '100%', height: 190, borderRadius: 12,
+                        background: '#EDE9FE', border: '1.5px dashed #C4B5FD',
+                        display: 'flex', flexDirection: 'column',
+                        alignItems: 'center', justifyContent: 'center', gap: 10,
+                    }}>
+                        <Px grid={STAR} size={8} />
+                        <div style={{
+                            fontFamily: "'Jersey 10',monospace", fontSize: 12,
+                            color: '#A78BFA', letterSpacing: '1px',
+                        }}>
+                            Writing
+                            <span className="gen-dot"> ·</span>
+                            <span className="gen-dot">·</span>
+                            <span className="gen-dot">·</span>
+                        </div>
+                    </div>
+                ) : (
+                    <div style={{
+                        width: '100%', height: 190, borderRadius: 12,
+                        background: '#EDE9FE', border: '1.5px dashed #C4B5FD',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                        <Px grid={STAR} size={10} />
+                    </div>
+                )}
+
+                <div style={{ opacity: .4 }}>
+                    <Px grid={CAT} size={4} />
+                </div>
+            </div>
+
+            {/* SPINE */}
+            <div style={{
+                width: 16, flexShrink: 0,
+                background: 'linear-gradient(to right,rgba(196,181,253,.45),rgba(237,233,254,.08))',
+            }} />
+
+            {/* RIGHT — text */}
+            <div
+                className="book-lines"
+                style={{
+                    flex: 1, background: '#FFFDF7',
+                    padding: '40px 32px 36px',
+                    fontFamily: "'DM Sans',sans-serif",
+                    fontSize: 17, lineHeight: 1.95,
+                    color: '#374151', fontWeight: 500,
+                    minHeight: 440, position: 'relative',
+                }}
+            >
+                {spread?.text
+                    ? <p style={{ margin: 0 }}>{spread.text}</p>
+                    : <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>The adventure continues...</span>
+                }
+
+                {creativeNote && idx === 0 && (
+                    <div style={{
+                        position: 'absolute', bottom: 20, left: 24, right: 24,
+                        padding: '9px 14px', background: '#FFF1F2',
+                        border: '1.5px dashed #FECDD3', borderRadius: 10,
+                        fontSize: 12, color: '#9F1239',
+                        fontStyle: 'italic', lineHeight: 1.6,
+                    }}>
+                        🎨 {creativeNote}
+                    </div>
+                )}
+
+                <div style={{
+                    position: 'absolute', bottom: 14, right: 20,
+                    fontFamily: "'Jersey 10',monospace",
+                    fontSize: 13, color: '#C4B5FD', letterSpacing: '1px',
+                }}>
+                    {idx + 1}
+                </div>
+            </div>
+        </div>
+    )
+}
+
+/* ── AudioBar — shown inside the open book ── */
+function AudioBar({ isPlaying, hasAudio, currentPage, totalPages, onToggle, onReplay }) {
+    if (!hasAudio && !isPlaying) return null
+    return (
+        <div className="audio-bar">
+            {/* waveform indicator */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 2, height: 20 }}>
+                {[12, 16, 10, 14, 10].map((h, i) => (
+                    <div
+                        key={i}
+                        className={`audio-wave-bar${isPlaying ? ' playing' : ''}`}
+                        style={{ height: h }}
+                    />
+                ))}
+            </div>
+
+            {/* label */}
+            <div style={{ flex: 1 }}>
+                <div style={{
+                    fontFamily: "'Jersey 10',monospace", fontSize: 14,
+                    color: '#6D28D9', letterSpacing: '1px',
+                }}>
+                    {isPlaying ? 'Narrating...' : 'Narration ready'}
+                </div>
+                {currentPage > 0 && (
+                    <div style={{
+                        fontFamily: "'DM Sans',sans-serif", fontSize: 11,
+                        color: '#9CA3AF', fontWeight: 500, marginTop: 1,
+                    }}>
+                        Page {currentPage} of {totalPages}
+                    </div>
+                )}
+            </div>
+
+            {/* replay button */}
+            <button
+                className="audio-btn audio-btn-replay"
+                onClick={onReplay}
+                title="Replay current narration"
+            >
+                ↺
+            </button>
+
+            {/* play / pause button */}
+            <button
+                className="audio-btn audio-btn-play"
+                onClick={onToggle}
+                title={isPlaying ? 'Pause narration' : 'Play narration'}
+            >
+                {isPlaying ? '⏸' : '▶'}
+            </button>
+        </div>
+    )
+}
+
+/* ── Main StoryBook ── */
 export default function StoryBook({
     segments, done, brief, creativeNote,
     isGenerating, onNewStory, onViewHistory,
-    storyKey,          /* pass a new value each time a story loads to reset state */
+    storyKey,
+    currentAudioPage,
+    isAudioPlaying,
+    hasAudio,
+    onToggleAudio,
+    onReplayAudio,
 }) {
     const [bookOpen, setBookOpen] = useState(false)
     const [isOpening, setIsOpening] = useState(false)
-    const [idx, setIdx] = useState(0)
-    const [anim, setAnim] = useState('anim-visible')
+    const [displayIdx, setDisplayIdx] = useState(0)
+    const [targetIdx, setTargetIdx] = useState(0)
+    const [enterClass, setEnterClass] = useState('pg-enterRight')
     const [flipping, setFlipping] = useState(false)
-    const endRef = useRef(null)
+    const autoAdvanceRef = useRef(true)
 
-    /* ── reset whenever a new story is loaded (storyKey changes) ── */
+    /* reset on new story */
     useEffect(() => {
         setBookOpen(false)
         setIsOpening(false)
-        setIdx(0)
-        setAnim('anim-visible')
+        setDisplayIdx(0)
+        setTargetIdx(0)
+        setEnterClass('pg-enterRight')
         setFlipping(false)
+        autoAdvanceRef.current = true
     }, [storyKey])
 
-    /* ── auto-scroll during generation ── */
+    /* open book immediately when generation starts */
     useEffect(() => {
-        endRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
-    }, [segments])
+        if (isGenerating && !bookOpen) setBookOpen(true)
+    }, [isGenerating])
 
-    /* ── open book after generation completes ── */
+    /* open book with cover animation when done (library load) */
     useEffect(() => {
         if (done && !bookOpen && !isOpening) {
             const t = setTimeout(() => {
                 setIsOpening(true)
-                setTimeout(() => { setBookOpen(true); setAnim('anim-visible') }, 1500)
+                setTimeout(() => setBookOpen(true), 1500)
             }, 600)
             return () => clearTimeout(t)
         }
-    }, [done])   /* intentionally only [done] — don't re-trigger on bookOpen change */
+    }, [done])
 
     const spreads = toSpreads(segments)
-    const spread = spreads[idx]
 
-    /* ── page flip — uses slide-fade, no 3D flicker ── */
-    const flip = (dir) => {
+    /* auto-advance: only when image is resolved AND audio for that page finished */
+    useEffect(() => {
+        if (!isGenerating || !autoAdvanceRef.current || flipping) return
+        let lastComplete = -1
+        for (let i = 0; i < spreads.length; i++) {
+            if (spreads[i].image) lastComplete = i
+        }
+        if (lastComplete < 0) return
+        const gate = currentAudioPage != null
+            ? Math.min(lastComplete, currentAudioPage)
+            : lastComplete
+        if (gate > displayIdx) doFlip(displayIdx + 1, 'next')
+    }, [spreads.length, spreads.map(s => s.image).join(','), currentAudioPage])
+
+    const doFlip = (next, dir) => {
         if (flipping) return
-        const next = dir === 'next' ? idx + 1 : idx - 1
-        if (next < 0 || next >= spreads.length) return
         setFlipping(true)
-        setAnim(dir === 'next' ? 'anim-outLeft' : 'anim-outRight')
+        setTargetIdx(next)
+        const exitCls = dir === 'next' ? 'pg-exitLeft' : 'pg-exitRight'
+        const enterCls = dir === 'next' ? 'pg-enterRight' : 'pg-enterLeft'
+        setEnterClass(exitCls)
         setTimeout(() => {
-            setIdx(next)
-            setAnim(dir === 'next' ? 'anim-inRight' : 'anim-inLeft')
-            setTimeout(() => { setFlipping(false); setAnim('anim-visible') }, 260)
-        }, 230)
+            setDisplayIdx(next)
+            setEnterClass(enterCls)
+            setTimeout(() => { setFlipping(false); setEnterClass('') }, 270)
+        }, 225)
+    }
+
+    const flip = (dir) => {
+        const next = dir === 'next' ? displayIdx + 1 : displayIdx - 1
+        if (next < 0 || next >= spreads.length || flipping) return
+        autoAdvanceRef.current = false
+        doFlip(next, dir)
     }
 
     const jumpTo = (i) => {
-        if (flipping || i === idx) return
-        const dir = i > idx ? 'next' : 'prev'
-        setFlipping(true)
-        setAnim(dir === 'next' ? 'anim-outLeft' : 'anim-outRight')
-        setTimeout(() => {
-            setIdx(i)
-            setAnim(dir === 'next' ? 'anim-inRight' : 'anim-inLeft')
-            setTimeout(() => { setFlipping(false); setAnim('anim-visible') }, 260)
-        }, 230)
+        if (i === displayIdx || flipping) return
+        autoAdvanceRef.current = false
+        doFlip(i, i > displayIdx ? 'next' : 'prev')
     }
 
-    /* ════════════════════════════════════════════════
-       RENDER 1 — generating live stream preview
-    ════════════════════════════════════════════════ */
-    if (!done && isGenerating) return (
-        <div style={{ maxWidth: 660, margin: '0 auto', padding: '40px 20px' }}>
+    const spread = spreads[displayIdx]
+    const isLastSpread = displayIdx === spreads.length - 1
+
+    /* ── fallback / error ── */
+    if (!isGenerating && !done && !bookOpen) return (
+        <div style={{ maxWidth: 500, margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
             <style>{STYLES}</style>
-            <div style={{ textAlign: 'center', marginBottom: 20 }}>
-                <div className="float-it" style={{ display: 'inline-block', marginBottom: 14 }}>
-                    <Px grid={WAND} size={9} />
-                </div>
-                <div style={{
-                    fontFamily: "'Jersey 10',monospace", fontSize: 32,
-                    color: '#6D28D9', letterSpacing: '1.5px', marginBottom: 6
-                }}>
-                    Writing {brief.child_name || 'the'} story...
-                </div>
-                <div style={{
-                    fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF',
-                    fontSize: 15, fontWeight: 500
-                }}>
-                    Gemini is crafting · Imagen 3 is painting
-                </div>
+            <div style={{ marginBottom: 20 }}><Px grid={DRAGON} size={8} /></div>
+            <div style={{ fontFamily: "'Jersey 10',monospace", fontSize: 26, color: '#6D28D9', letterSpacing: '1.5px', marginBottom: 10 }}>
+                Hmm, something went wrong
             </div>
-
-            <div style={{ display: 'flex', justifyContent: 'center', gap: 5, marginBottom: 24 }}>
-                {[0, 1, 2, 3, 4, 5].map(i => (
-                    <div key={i} style={{
-                        width: 26, height: 4, borderRadius: 2, background: '#DDD6FE',
-                        animation: 'genPulse 1.5s ease-in-out infinite',
-                        animationDelay: `${i * .18}s`,
-                    }} />
-                ))}
+            <div style={{ fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF', fontSize: 15, fontWeight: 500, marginBottom: 28, lineHeight: 1.7 }}>
+                Could not reach the backend.<br />
+                Check your{' '}
+                <code style={{ background: '#EDE9FE', padding: '2px 7px', borderRadius: 6, color: '#6D28D9', fontSize: 13 }}>VITE_BACKEND_URL</code>
             </div>
-
-            <div style={{
-                background: '#F5F3FF', border: '1.5px dashed #C4B5FD',
-                borderRadius: 20, padding: '28px 32px', minHeight: 200,
-                fontFamily: "'DM Sans',sans-serif", fontSize: 16,
-                lineHeight: 1.95, color: '#374151', fontWeight: 500,
-            }}>
-                {segments.filter(s => s.type === 'text').map((s, i) => <span key={i}>{s.content}</span>)}
-                {segments.filter(s => s.type === 'image_loading').map((s, i) => (
-                    <div key={i} style={{ marginTop: 14, marginBottom: 6 }}>
-                        <div className="skel" style={{ height: 150 }} />
-                        <div style={{
-                            fontFamily: "'Jersey 10',monospace", fontSize: 13,
-                            color: '#A78BFA', textAlign: 'center', marginTop: 6, letterSpacing: '1px',
-                        }}>
-                            Painting illustration...
-                        </div>
-                    </div>
-                ))}
-                {segments.length === 0 && (
-                    <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>The story is beginning...</span>
-                )}
-                <div ref={endRef} />
-            </div>
-
-            {creativeNote && (
-                <div style={{
-                    marginTop: 14, padding: '10px 18px', background: '#FFF1F2',
-                    border: '1.5px dashed #FECDD3', borderRadius: 12,
-                    fontSize: 13, color: '#9F1239', fontStyle: 'italic',
-                    fontWeight: 500, lineHeight: 1.6,
+            <button onClick={onNewStory}
+                style={{
+                    fontFamily: "'Jersey 10',monospace", fontSize: 18, letterSpacing: '1px',
+                    background: 'linear-gradient(135deg,#6D28D9,#4C1D95)', color: '#EDE9FE',
+                    border: 'none', borderRadius: 14, padding: '12px 36px', cursor: 'pointer', boxShadow: '0 5px 0 #3B0764'
                 }}>
-                    🎨 {creativeNote}
-                </div>
-            )}
+                ← Back to Form
+            </button>
         </div>
     )
 
-    /* ════════════════════════════════════════════════
-       RENDER 2 — done, book cover (not yet opened)
-    ════════════════════════════════════════════════ */
+    /* ── cover (library load — done but book not opened) ── */
     if (done && !bookOpen) return (
-        <div className="anim-bookUp" style={{
-            display: 'flex', flexDirection: 'column',
-            alignItems: 'center', padding: '44px 20px',
-        }}>
+        <div className="anim-bookUp" style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '44px 20px' }}>
             <style>{STYLES}</style>
-            <div style={{
-                fontFamily: "'Jersey 10',monospace", fontSize: 34,
-                color: '#6D28D9', letterSpacing: '2px', marginBottom: 4,
-            }}>
+            <div style={{ fontFamily: "'Jersey 10',monospace", fontSize: 34, color: '#6D28D9', letterSpacing: '2px', marginBottom: 4 }}>
                 ✨ Story Complete!
             </div>
-            <div style={{
-                fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF',
-                fontSize: 15, fontWeight: 500, marginBottom: 48,
-            }}>
-                {spreads.length} pages ready · tap the book to open it
+            <div style={{ fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF', fontSize: 15, fontWeight: 500, marginBottom: 48 }}>
+                {spreads.length} pages · tap to open
             </div>
 
-            {/* Book object */}
-            <div style={{
-                position: 'relative', width: 240, height: 340,
-                cursor: isOpening ? 'default' : 'pointer',
-                marginBottom: 44,
-            }}
-                onClick={() => {
-                    if (!isOpening) {
-                        setIsOpening(true)
-                        setTimeout(() => setBookOpen(true), 1500)
-                    }
-                }}
-            >
-                {/* page stack behind cover */}
-                <div style={{
-                    position: 'absolute', left: 8, top: 4,
-                    width: '100%', height: '100%',
-                    background: '#F0EBE3', borderRadius: '4px 14px 14px 4px',
-                    boxShadow: '3px 5px 18px rgba(0,0,0,.1)',
-                }} />
-                <div style={{
-                    position: 'absolute', left: 4, top: 2,
-                    width: '100%', height: '100%',
-                    background: '#FBF7F2', borderRadius: '4px 14px 14px 4px',
-                }} />
-
-                {/* pages revealed after cover flips */}
+            <div style={{ position: 'relative', width: 240, height: 340, cursor: isOpening ? 'default' : 'pointer', marginBottom: 44 }}
+                onClick={() => { if (!isOpening) { setIsOpening(true); setTimeout(() => setBookOpen(true), 1500) } }}>
+                <div style={{ position: 'absolute', left: 8, top: 4, width: '100%', height: '100%', background: '#F0EBE3', borderRadius: '4px 14px 14px 4px', boxShadow: '3px 5px 18px rgba(0,0,0,.1)' }} />
+                <div style={{ position: 'absolute', left: 4, top: 2, width: '100%', height: '100%', background: '#FBF7F2', borderRadius: '4px 14px 14px 4px' }} />
                 {isOpening && (
-                    <div className="pages-in" style={{
-                        position: 'absolute', inset: 0,
-                        background: 'linear-gradient(to right,#EDE9FE,#FFFDF7)',
-                        borderRadius: '4px 14px 14px 4px',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    }}>
+                    <div className="pages-in" style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to right,#EDE9FE,#FFFDF7)', borderRadius: '4px 14px 14px 4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
                         <Px grid={STAR} size={11} />
                     </div>
                 )}
-
-                {/* cover */}
-                <div
-                    className={isOpening ? 'cover-flip' : ''}
+                <div className={isOpening ? 'cover-flip' : ''}
                     style={{
                         position: 'absolute', inset: 0,
                         background: 'linear-gradient(145deg,#6D28D9,#4C1D95 60%,#3B0764)',
                         borderRadius: '4px 14px 14px 4px',
-                        boxShadow: isOpening
-                            ? 'none'
-                            : '-4px 0 0 #3B0764, 6px 7px 28px rgba(109,40,217,.35)',
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center',
-                        gap: 12, padding: 26,
-                    }}
-                >
-                    <div style={{ position: 'absolute', top: 10, left: 10, opacity: .35 }}>
-                        <Px grid={STAR} size={3} />
-                    </div>
-                    <div style={{ position: 'absolute', bottom: 10, right: 10, opacity: .25 }}>
-                        <Px grid={STAR} size={3} />
-                    </div>
-                    <Px grid={DRAGON} size={7} />
-                    <div style={{
-                        fontFamily: "'Jersey 10',monospace", fontSize: 20,
-                        color: '#EDE9FE', textAlign: 'center',
-                        letterSpacing: '1.5px', lineHeight: 1.45,
+                        boxShadow: isOpening ? 'none' : '-4px 0 0 #3B0764, 6px 7px 28px rgba(109,40,217,.35)',
+                        display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 12, padding: 26
                     }}>
+                    <div style={{ position: 'absolute', top: 10, left: 10, opacity: .35 }}><Px grid={STAR} size={3} /></div>
+                    <div style={{ position: 'absolute', bottom: 10, right: 10, opacity: .25 }}><Px grid={STAR} size={3} /></div>
+                    <Px grid={DRAGON} size={7} />
+                    <div style={{ fontFamily: "'Jersey 10',monospace", fontSize: 20, color: '#EDE9FE', textAlign: 'center', letterSpacing: '1.5px', lineHeight: 1.45 }}>
                         {brief.child_name || 'My'}'s<br />Storybook
                     </div>
-                    <div style={{
-                        width: 44, height: 1.5,
-                        background: 'rgba(196,181,253,.4)', borderRadius: 2,
-                    }} />
-                    <div style={{
-                        fontFamily: "'DM Sans',sans-serif", fontSize: 11,
-                        color: '#A78BFA', fontWeight: 600,
-                        letterSpacing: '.8px', textTransform: 'uppercase',
-                    }}>
+                    <div style={{ width: 44, height: 1.5, background: 'rgba(196,181,253,.4)', borderRadius: 2 }} />
+                    <div style={{ fontFamily: "'DM Sans',sans-serif", fontSize: 11, color: '#A78BFA', fontWeight: 600, letterSpacing: '.8px', textTransform: 'uppercase' }}>
                         {brief.style} · ages {brief.age_group}
                     </div>
-                    <div style={{
-                        position: 'absolute', left: 14, top: 18, bottom: 18,
-                        width: 1.5, background: 'rgba(167,139,250,.2)', borderRadius: 4,
-                    }} />
+                    <div style={{ position: 'absolute', left: 14, top: 18, bottom: 18, width: 1.5, background: 'rgba(167,139,250,.2)', borderRadius: 4 }} />
                 </div>
             </div>
 
             {!isOpening ? (
-                <button
-                    onClick={() => {
-                        setIsOpening(true)
-                        setTimeout(() => setBookOpen(true), 1500)
-                    }}
+                <button onClick={() => { setIsOpening(true); setTimeout(() => setBookOpen(true), 1500) }}
                     style={{
-                        fontFamily: "'Jersey 10',monospace", fontSize: 20,
-                        letterSpacing: '1.5px',
-                        background: 'linear-gradient(135deg,#6D28D9,#4C1D95)',
-                        color: '#EDE9FE', border: 'none', borderRadius: 16,
-                        padding: '13px 44px', cursor: 'pointer',
-                        boxShadow: '0 6px 0 #3B0764, 0 14px 30px rgba(109,40,217,.28)',
-                        transition: 'transform .1s, box-shadow .1s',
+                        fontFamily: "'Jersey 10',monospace", fontSize: 20, letterSpacing: '1.5px',
+                        background: 'linear-gradient(135deg,#6D28D9,#4C1D95)', color: '#EDE9FE',
+                        border: 'none', borderRadius: 16, padding: '13px 44px', cursor: 'pointer',
+                        boxShadow: '0 6px 0 #3B0764, 0 14px 30px rgba(109,40,217,.28)'
                     }}
-                    onMouseDown={e => {
-                        e.currentTarget.style.transform = 'translateY(5px)'
-                        e.currentTarget.style.boxShadow = '0 1px 0 #3B0764'
-                    }}
-                    onMouseUp={e => {
-                        e.currentTarget.style.transform = ''
-                        e.currentTarget.style.boxShadow = '0 6px 0 #3B0764, 0 14px 30px rgba(109,40,217,.28)'
-                    }}
-                >
+                    onMouseDown={e => { e.currentTarget.style.transform = 'translateY(5px)'; e.currentTarget.style.boxShadow = '0 1px 0 #3B0764' }}
+                    onMouseUp={e => { e.currentTarget.style.transform = ''; e.currentTarget.style.boxShadow = '0 6px 0 #3B0764, 0 14px 30px rgba(109,40,217,.28)' }}>
                     📖 Open Your Story
                 </button>
             ) : (
-                <div style={{
-                    fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF',
-                    fontSize: 15, fontStyle: 'italic',
-                }}>
+                <div style={{ fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF', fontSize: 15, fontStyle: 'italic' }}>
                     Opening the book...
                 </div>
             )}
         </div>
     )
 
-    /* ════════════════════════════════════════════════
-       RENDER 3 — open book reader
-    ════════════════════════════════════════════════ */
-    if (bookOpen && spreads.length > 0) return (
-        <div style={{ padding: '28px 12px 52px', animation: 'bookUp .5s ease both' }}>
+    /* ── open book (generation + reading) ── */
+    return (
+        <div style={{ padding: '24px 12px 52px' }} className="anim-bookUp">
             <style>{STYLES}</style>
 
-            <div style={{ textAlign: 'center', marginBottom: 24 }}>
-                <div style={{
-                    fontFamily: "'Jersey 10',monospace", fontSize: 28,
-                    color: '#6D28D9', letterSpacing: '1.5px', marginBottom: 2,
-                }}>
+            {/* title */}
+            <div style={{ textAlign: 'center', marginBottom: 20 }}>
+                <div style={{ fontFamily: "'Jersey 10',monospace", fontSize: 26, color: '#6D28D9', letterSpacing: '1.5px', marginBottom: 2 }}>
                     {brief.child_name || 'My'}'s Storybook
                 </div>
-                <div style={{
-                    fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF',
-                    fontSize: 14, fontWeight: 500,
-                }}>
-                    Page {idx + 1} of {spreads.length}
+                <div style={{ fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF', fontSize: 13, fontWeight: 500, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 10 }}>
+                    Page {displayIdx + 1} of {spreads.length || '…'}
+                    {isGenerating && (
+                        <span style={{
+                            background: '#EDE9FE', color: '#6D28D9', border: '1px solid #C4B5FD', borderRadius: 50,
+                            padding: '2px 10px', fontSize: 11, fontWeight: 600,
+                            display: 'inline-flex', alignItems: 'center', gap: 5
+                        }}>
+                            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#6D28D9', display: 'inline-block', animation: 'floatY 1s ease-in-out infinite' }} />
+                            Generating
+                        </span>
+                    )}
                 </div>
             </div>
 
-            {/* ── THE OPEN BOOK ── */}
-            <div
-                className="spread-wrap"
-                style={{
-                    display: 'flex', maxWidth: 900, margin: '0 auto', minHeight: 460,
-                    boxShadow: '-5px 0 0 #C4B5FD, 10px 12px 44px rgba(109,40,217,.12)',
-                }}
-            >
-                {/* animated content wrapper — only this slides, not the whole book shell */}
-                <div
-                    className={anim}
-                    style={{ display: 'flex', width: '100%', minHeight: 460 }}
-                >
-                    {/* LEFT — illustration */}
+            {/* book shell */}
+            <div style={{
+                maxWidth: 900, margin: '0 auto', minHeight: 460, position: 'relative',
+                overflow: 'hidden', borderRadius: '6px 20px 20px 6px',
+                boxShadow: '-5px 0 0 #C4B5FD, 10px 12px 44px rgba(109,40,217,.12)'
+            }}>
+                {spreads.length > 0 ? (
+                    <PageSpread
+                        key={displayIdx}
+                        spread={spread}
+                        idx={displayIdx}
+                        enterClass={enterClass || 'pg-enterRight'}
+                        creativeNote={creativeNote}
+                        isGenerating={isGenerating}
+                        isLastSpread={isLastSpread}
+                    />
+                ) : (
                     <div style={{
-                        flex: '0 0 44%', background: '#F5F3FF',
-                        borderRight: '2px solid rgba(196,181,253,.28)',
-                        padding: '32px 24px',
-                        display: 'flex', flexDirection: 'column',
-                        alignItems: 'center', justifyContent: 'center', gap: 14,
+                        display: 'flex', width: '100%', minHeight: 460, alignItems: 'center',
+                        justifyContent: 'center', background: 'linear-gradient(to right,#F5F3FF,#FFFDF7)',
+                        flexDirection: 'column', gap: 16
                     }}>
-                        <div style={{
-                            fontFamily: "'Jersey 10',monospace", fontSize: 12,
-                            color: '#A78BFA', letterSpacing: '2px', textTransform: 'uppercase',
-                        }}>
-                            Page {idx + 1}
+                        <div className="float-it"><Px grid={DRAGON} size={9} /></div>
+                        <div style={{ fontFamily: "'Jersey 10',monospace", fontSize: 22, color: '#6D28D9', letterSpacing: '1.5px' }}>
+                            Writing the story
+                            <span className="gen-dot"> ·</span>
+                            <span className="gen-dot">·</span>
+                            <span className="gen-dot">·</span>
                         </div>
-
-                        {spread?.image ? (
-                            <img
-                                src={spread.image}
-                                alt={`Illustration ${idx + 1}`}
-                                style={{
-                                    width: '100%', borderRadius: 12,
-                                    boxShadow: '0 4px 20px rgba(109,40,217,.14)',
-                                    display: 'block',
-                                }}
-                                onError={e => { e.target.style.display = 'none' }}
-                            />
-                        ) : spread?.loading ? (
-                            <div className="skel" style={{ width: '100%', height: 200 }} />
-                        ) : (
-                            <div style={{
-                                width: '100%', height: 200, borderRadius: 12,
-                                background: '#EDE9FE', border: '1.5px dashed #C4B5FD',
-                                display: 'flex', alignItems: 'center', justifyContent: 'center',
-                            }}>
-                                <Px grid={STAR} size={10} />
-                            </div>
-                        )}
-
-                        <div style={{ opacity: .4 }}>
-                            <Px grid={CAT} size={4} />
+                        <div style={{ fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF', fontSize: 14, fontWeight: 500 }}>
+                            Gemini is crafting · Imagen 3 is painting
                         </div>
                     </div>
-
-                    {/* SPINE */}
-                    <div style={{
-                        width: 16, flexShrink: 0,
-                        background: 'linear-gradient(to right,rgba(196,181,253,.45),rgba(237,233,254,.08))',
-                    }} />
-
-                    {/* RIGHT — text */}
-                    <div className="book-lines" style={{
-                        flex: 1, background: '#FFFDF7',
-                        padding: '40px 32px 36px',
-                        fontFamily: "'DM Sans',sans-serif",
-                        fontSize: 17, lineHeight: 1.95,
-                        color: '#374151', fontWeight: 500,
-                        minHeight: 440, position: 'relative',
-                    }}>
-                        {spread?.text
-                            ? <p style={{ margin: 0 }}>{spread.text}</p>
-                            : <span style={{ color: '#9CA3AF', fontStyle: 'italic' }}>The adventure continues...</span>
-                        }
-
-                        {creativeNote && idx === 0 && (
-                            <div style={{
-                                position: 'absolute', bottom: 20, left: 24, right: 24,
-                                padding: '9px 14px', background: '#FFF1F2',
-                                border: '1.5px dashed #FECDD3', borderRadius: 10,
-                                fontSize: 12, color: '#9F1239',
-                                fontStyle: 'italic', lineHeight: 1.6,
-                            }}>
-                                🎨 {creativeNote}
-                            </div>
-                        )}
-
-                        <div style={{
-                            position: 'absolute', bottom: 14, right: 20,
-                            fontFamily: "'Jersey 10',monospace",
-                            fontSize: 13, color: '#C4B5FD', letterSpacing: '1px',
-                        }}>
-                            {idx + 1}
-                        </div>
-                    </div>
-                </div>
+                )}
             </div>
 
-            {/* ── NAVIGATION ── */}
+            {/* ── AUDIO BAR ── */}
+            <AudioBar
+                isPlaying={isAudioPlaying}
+                hasAudio={hasAudio}
+                currentPage={currentAudioPage}
+                totalPages={spreads.length}
+                onToggle={onToggleAudio}
+                onReplay={onReplayAudio}
+            />
+
+            {/* navigation */}
             <div style={{
                 display: 'flex', alignItems: 'center', justifyContent: 'center',
-                gap: 14, marginTop: 24, maxWidth: 900, margin: '24px auto 0',
+                gap: 14, maxWidth: 900, margin: '16px auto 0'
             }}>
-                <button
-                    onClick={() => flip('prev')}
-                    disabled={idx === 0 || flipping}
+                <button onClick={() => flip('prev')} disabled={displayIdx === 0 || flipping}
                     style={{
                         fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
-                        background: idx === 0 ? '#F5F3FF' : 'white',
-                        color: idx === 0 ? '#C4B5FD' : '#6D28D9',
-                        border: `1.5px solid ${idx === 0 ? '#DDD6FE' : '#A78BFA'}`,
+                        background: displayIdx === 0 ? '#F5F3FF' : 'white',
+                        color: displayIdx === 0 ? '#C4B5FD' : '#6D28D9',
+                        border: `1.5px solid ${displayIdx === 0 ? '#DDD6FE' : '#A78BFA'}`,
                         borderRadius: 12, padding: '10px 26px',
-                        cursor: idx === 0 ? 'not-allowed' : 'pointer',
-                        boxShadow: idx === 0 ? 'none' : '0 4px 0 #DDD6FE',
-                        transition: 'all .15s',
-                    }}
-                >
+                        cursor: displayIdx === 0 ? 'not-allowed' : 'pointer',
+                        boxShadow: displayIdx === 0 ? 'none' : '0 4px 0 #DDD6FE',
+                        transition: 'all .15s'
+                    }}>
                     ← Prev
                 </button>
 
-                {/* dot indicators */}
                 <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
                     {spreads.map((_, i) => (
-                        <button
-                            key={i}
-                            onClick={() => jumpTo(i)}
+                        <button key={i} onClick={() => jumpTo(i)}
                             style={{
-                                width: i === idx ? 20 : 8, height: 8,
-                                borderRadius: 4, border: 'none', padding: 0,
-                                cursor: i === idx ? 'default' : 'pointer',
-                                background: i === idx ? '#6D28D9' : '#DDD6FE',
-                                transition: 'all .2s',
+                                width: i === displayIdx ? 20 : 8, height: 8, borderRadius: 4,
+                                border: 'none', padding: 0,
+                                cursor: i === displayIdx ? 'default' : 'pointer',
+                                background: i === displayIdx ? '#6D28D9'
+                                    : spreads[i]?.image ? '#A78BFA'
+                                        : spreads[i]?.loading ? '#DDD6FE'
+                                            : '#E5E7EB',
+                                transition: 'all .2s'
                             }}
+                            title={spreads[i]?.image ? `Page ${i + 1} ready` : spreads[i]?.loading ? `Page ${i + 1} painting…` : `Page ${i + 1}`}
                         />
                     ))}
                 </div>
 
-                <button
-                    onClick={() => flip('next')}
-                    disabled={idx >= spreads.length - 1 || flipping}
+                <button onClick={() => flip('next')} disabled={displayIdx >= spreads.length - 1 || flipping}
                     style={{
                         fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
-                        background: idx >= spreads.length - 1 ? '#F5F3FF' : '#6D28D9',
-                        color: idx >= spreads.length - 1 ? '#C4B5FD' : '#EDE9FE',
+                        background: displayIdx >= spreads.length - 1 ? '#F5F3FF' : '#6D28D9',
+                        color: displayIdx >= spreads.length - 1 ? '#C4B5FD' : '#EDE9FE',
                         border: 'none', borderRadius: 12, padding: '10px 26px',
-                        cursor: idx >= spreads.length - 1 ? 'not-allowed' : 'pointer',
-                        boxShadow: idx >= spreads.length - 1 ? 'none' : '0 5px 0 #3B0764',
-                        transition: 'all .15s',
-                    }}
-                >
+                        cursor: displayIdx >= spreads.length - 1 ? 'not-allowed' : 'pointer',
+                        boxShadow: displayIdx >= spreads.length - 1 ? 'none' : '0 5px 0 #3B0764',
+                        transition: 'all .15s'
+                    }}>
                     Next →
                 </button>
             </div>
 
-            {/* ── ACTION BUTTONS ── */}
-            <div style={{
-                display: 'flex', gap: 12, justifyContent: 'center',
-                marginTop: 28, flexWrap: 'wrap',
-            }}>
-                <button
-                    onClick={onNewStory}
-                    style={{
-                        fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
-                        background: '#D1FAE5', color: '#047857',
-                        border: '1.5px solid #A7F3D0', borderRadius: 14,
-                        padding: '11px 28px', cursor: 'pointer',
-                        boxShadow: '0 4px 0 #A7F3D0', transition: 'transform .1s',
-                    }}
-                    onMouseDown={e => e.currentTarget.style.transform = 'translateY(3px)'}
-                    onMouseUp={e => e.currentTarget.style.transform = ''}
-                >
-                    ✨ New Story
-                </button>
-                <button
-                    onClick={onViewHistory}
-                    style={{
-                        fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
-                        background: '#DBEAFE', color: '#1D4ED8',
-                        border: '1.5px solid #BFDBFE', borderRadius: 14,
-                        padding: '11px 28px', cursor: 'pointer',
-                        boxShadow: '0 4px 0 #BFDBFE', transition: 'transform .1s',
-                    }}
-                    onMouseDown={e => e.currentTarget.style.transform = 'translateY(3px)'}
-                    onMouseUp={e => e.currentTarget.style.transform = ''}
-                >
-                    📚 Library
-                </button>
-            </div>
-        </div>
-    )
+            {/* dot legend during generation */}
+            {isGenerating && (
+                <div style={{
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    gap: 16, marginTop: 10, fontFamily: "'DM Sans',sans-serif",
+                    fontSize: 11, color: '#9CA3AF', fontWeight: 500
+                }}>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 4, background: '#A78BFA', display: 'inline-block' }} /> Ready
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 4, background: '#DDD6FE', display: 'inline-block' }} /> Painting
+                    </span>
+                    <span style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+                        <span style={{ width: 8, height: 8, borderRadius: 4, background: '#E5E7EB', display: 'inline-block' }} /> Writing
+                    </span>
+                </div>
+            )}
 
-    /* ── FALLBACK ── */
-    return (
-        <div style={{ maxWidth: 500, margin: '60px auto', padding: '0 20px', textAlign: 'center' }}>
-            <style>{STYLES}</style>
-            <div style={{ marginBottom: 20 }}><Px grid={DRAGON} size={8} /></div>
-            <div style={{
-                fontFamily: "'Jersey 10',monospace", fontSize: 26,
-                color: '#6D28D9', letterSpacing: '1.5px', marginBottom: 10,
-            }}>
-                Hmm, something went wrong
-            </div>
-            <div style={{
-                fontFamily: "'DM Sans',sans-serif", color: '#9CA3AF',
-                fontSize: 15, fontWeight: 500, marginBottom: 28, lineHeight: 1.7,
-            }}>
-                Could not reach the backend.<br />
-                Check your <code style={{ background: '#EDE9FE', padding: '2px 7px', borderRadius: 6, color: '#6D28D9', fontSize: 13 }}>VITE_BACKEND_URL</code> in your <code style={{ background: '#EDE9FE', padding: '2px 7px', borderRadius: 6, color: '#6D28D9', fontSize: 13 }}>.env</code> file.
-            </div>
-            <button
-                onClick={onNewStory}
-                style={{
-                    fontFamily: "'Jersey 10',monospace", fontSize: 18, letterSpacing: '1px',
-                    background: 'linear-gradient(135deg,#6D28D9,#4C1D95)',
-                    color: '#EDE9FE', border: 'none', borderRadius: 14,
-                    padding: '12px 36px', cursor: 'pointer',
-                    boxShadow: '0 5px 0 #3B0764',
-                }}
-            >
-                ← Back to Form
-            </button>
+            {/* action buttons — only after done */}
+            {done && (
+                <div style={{ display: 'flex', gap: 12, justifyContent: 'center', marginTop: 24, flexWrap: 'wrap' }}>
+                    <button onClick={onNewStory}
+                        style={{
+                            fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
+                            background: '#D1FAE5', color: '#047857', border: '1.5px solid #A7F3D0',
+                            borderRadius: 14, padding: '11px 28px', cursor: 'pointer',
+                            boxShadow: '0 4px 0 #A7F3D0', transition: 'transform .1s'
+                        }}
+                        onMouseDown={e => e.currentTarget.style.transform = 'translateY(3px)'}
+                        onMouseUp={e => e.currentTarget.style.transform = ''}>
+                        ✨ New Story
+                    </button>
+                    <button onClick={onViewHistory}
+                        style={{
+                            fontFamily: "'Jersey 10',monospace", fontSize: 16, letterSpacing: '1px',
+                            background: '#DBEAFE', color: '#1D4ED8', border: '1.5px solid #BFDBFE',
+                            borderRadius: 14, padding: '11px 28px', cursor: 'pointer',
+                            boxShadow: '0 4px 0 #BFDBFE', transition: 'transform .1s'
+                        }}
+                        onMouseDown={e => e.currentTarget.style.transform = 'translateY(3px)'}
+                        onMouseUp={e => e.currentTarget.style.transform = ''}>
+                        📚 Library
+                    </button>
+                </div>
+            )}
         </div>
     )
 }
