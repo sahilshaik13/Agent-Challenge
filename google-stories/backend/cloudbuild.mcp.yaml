@@ -1,0 +1,11 @@
+steps:
+  - name: 'gcr.io/cloud-builders/docker'
+    args:
+      - 'build'
+      - '-t'
+      - 'us-central1-docker.pkg.dev/sincere-quasar-490216-b4/google-stories-repo/mcp:latest'
+      - '-f'
+      - 'Dockerfile.mcp'
+      - '.'
+images:
+  - 'us-central1-docker.pkg.dev/sincere-quasar-490216-b4/google-stories-repo/mcp:latest'
