@@ -5,8 +5,6 @@ const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || 'http://localhost:8080'
 const STORAGE_KEY_CURRENT = 'gs_current_story'
 const STORAGE_KEY_HISTORY = 'gs_story_history'
 const MAX_HISTORY = 20
-const [currentAudioPage, setCurrentAudioPage] = useState(0)
-
 /* ─── STORAGE HELPERS ─── */
 const saveCurrentStory = (d) => { try { localStorage.setItem(STORAGE_KEY_CURRENT, JSON.stringify(d)) } catch { } }
 const loadCurrentStory = () => { try { const d = localStorage.getItem(STORAGE_KEY_CURRENT); return d ? JSON.parse(d) : null } catch { return null } }
@@ -263,6 +261,7 @@ export default function App() {
   const [pageCount, setPageCount] = useState(0)
   const [creativeNote, setCreativeNote] = useState('')
   const [storyId, setStoryId] = useState(null)
+  const [currentAudioPage, setCurrentAudioPage] = useState(0)
 
   const audioQ = useRef([])
   const playing = useRef(false)
